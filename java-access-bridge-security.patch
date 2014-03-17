@@ -1,0 +1,25 @@
+--- openjdk/jdk/src/share/lib/security/java.security-linux
++++ openjdk/jdk/src/share/lib/security/java.security-linux
+@@ -154,7 +154,9 @@
+                com.sun.org.apache.xml.internal.security.,\
+                com.sun.org.glassfish.,\
+                com.sun.naming.internal.,\
+-               org.jcp.xml.dsig.internal.
++               org.jcp.xml.dsig.internal.,\
++               org.GNOME.Accessibility.,\
++               org.GNOME.Bonobo.
+ 
+ #
+ # List of comma-separated packages that start with or equal this string
+@@ -193,7 +195,9 @@
+                    com.sun.org.apache.xml.internal.security.,\
+                    com.sun.org.glassfish.,\
+                    com.sun.naming.internal.,\
+-                   org.jcp.xml.dsig.internal.
++                   org.jcp.xml.dsig.internal.,\
++                   org.GNOME.Accessibility.,\
++                   org.GNOME.Bonobo.
+ 
+ #
+ # Determines whether this properties file can be appended to
+
