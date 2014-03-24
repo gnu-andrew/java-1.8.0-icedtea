@@ -1,11 +1,10 @@
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 0
+%define gcjbootstrap 1
 
-# If debug is 1, IcedTea is built with all debug info present.
+# If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
-
 
 %define icedteaver 1.13.1
 %define icedteasnapshot %{nil}
@@ -20,7 +19,7 @@
 %define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
 %define openjdkurl https://java.net/downloads/openjdk6/
-%define rhelzip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-rhel.tar.gz
+%define openjdkzip  openjdk-6-src-%{openjdkver}-%{openjdkdate}.tar.xz
 
 %define multilib_arches ppc64 sparc64 x86_64
 
@@ -77,22 +76,16 @@
 
 %define buildoutputdir openjdk.build
 
+%ifarch %{jit_arches}
+%define systemtapopt --enable-systemtap
+%else
+%define systemtapopt %{nil}
+%endif
+
 %if %{gcjbootstrap}
-
-%ifarch %{jit_arches}
-%define icedteaopt --enable-systemtap
+%define bootstrapopt %{nil}
 %else
-%define icedteaopt %{nil}
-%endif
-
-%else
-
-%ifarch %{jit_arches}
-%define icedteaopt --with-jdk-home=/usr/lib/jvm/%{sdklnk} --disable-bootstrap --enable-systemtap
-%else
-%define icedteaopt --with-jdk-home=/usr/lib/jvm/%{sdklnk} --disable-bootstrap
-%endif
-
+%define bootstrapopt --disable-bootstrap
 %endif
 
 # Convert an absolute path to a relative path.  Each symbolic link is
@@ -113,7 +106,7 @@
 %endif
 
 # Standard JPackage naming and versioning defines.
-%define origin          openjdk
+%define origin          icedtea
 %define priority        16000
 %define javaver         1.6.0
 %define buildver        0
@@ -155,8 +148,8 @@
 %define __jar_repack 0
 
 Name:    java-%{javaver}-%{origin}
-Version: %{javaver}.%{buildver}
-Release: 3.%{icedteaver}%{?dist}
+Version: %{icedteaver}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -172,12 +165,11 @@ Group:   Development/Languages
 
 License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, MPLv1.0, MPLv1.1, Public Domain, W3C
 URL:      http://icedtea.classpath.org/
-Source0:  %{icedteaurl}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+Source0:  %{icedteaurl}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.xz
 # To generate, download OpenJDK tarball from %{openjdkurl},
 # and run %{SOURCE3} on the tarball.
-Source1:  %{rhelzip}
+Source1:  %{openjdkzip}
 Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.bz2
-Source3:  %{genurl}generate-rhel-zip.sh
 Source4:  README.src
 
 # Pre-2009 changelog, retained to ensure contributions are not lost
@@ -186,46 +178,49 @@ SOURCE900: pre-2009-spec-changelog
 # FIXME: This patch needs to be fixed. optflags argument
 # -mtune=generic is being ignored because it breaks several graphical
 # applications.
-Patch0:   java-1.6.0-openjdk-optflags.patch
-Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
-Patch2:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
-Patch3:	  java-1.6.0-openjdk-java-access-bridge-security.patch
-Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
-Patch5:   java-1.6.0-openjdk-debugdocs.patch
-Patch6:   %{name}-debuginfo.patch
-Patch7:   1.13_fixes.patch
-# This is a RHEL-specific patch that upstream will not accept
-# it uses 'internal' API - the format of /etc/sysconfig/clock
-Patch8:   java-1.6.0-openjdk-timezone-id.patch
+Patch0:   optflags.patch
+Patch1:   java-access-bridge-tck.patch
+Patch2:   java-access-bridge-idlj.patch
+Patch3:	  java-access-bridge-security.patch
+Patch4:   accessible-toolkit.patch
+Patch5:   debugdocs.patch
+Patch6:   debuginfo.patch
+Patch7:   1.13.1-post-version_bump.patch
+Patch8:   1.13.1-post-jdk_generic_profile_fix.patch
+Patch9:   1.13.1-post-auto_disable_system_lcms.patch
+Patch10:   1.13.1-post-werror.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: alsa-lib-devel
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
-BuildRequires: giflib-devel
 BuildRequires: libX11-devel
 BuildRequires: libXi-devel
-BuildRequires: libXp-devel
 BuildRequires: libXt-devel
 BuildRequires: libXtst-devel
+BuildRequires: libXext-devel
+BuildRequires: libXrender-devel
+BuildRequires: libXau-devel
+BuildRequires: libXdmcp-devel
+BuildRequires: libXinerama-devel
+BuildRequires: zlib-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
+BuildRequires: giflib-devel
 BuildRequires: wget
-BuildRequires: xalan-j2
-BuildRequires: xerces-j2
 BuildRequires: xorg-x11-proto-devel
-BuildRequires: mercurial
 BuildRequires: ant
 BuildRequires: ant-nodeps
-BuildRequires: libXinerama-devel
 BuildRequires: rhino
 BuildRequires: redhat-lsb
+BuildRequires: nss-devel
+BuildRequires: krb5-devel
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
+BuildRequires: libxslt
 %else
 BuildRequires: java-1.6.0-openjdk-devel
 %endif
@@ -253,11 +248,8 @@ BuildRequires: prelink
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
 %endif
-# visualvm build requirements.
-BuildRequires: jakarta-commons-logging
 
 Requires: fontconfig
-Requires: rhino
 Requires: libjpeg = 6b
 # Require /etc/pki/java/cacerts.
 Requires: ca-certificates
@@ -265,6 +257,8 @@ Requires: ca-certificates
 Requires: jpackage-utils >= 1.7.3-1jpp.2
 # Require zoneinfo data provided by tzdata-java subpackage.
 Requires: tzdata-java
+# Gtk+ look and feel
+Requires: gtk2
 # Post requires alternatives to install tool alternatives.
 Requires(post):   %{_sbindir}/alternatives
 # Postun requires alternatives to uninstall tool alternatives.
@@ -356,15 +350,14 @@ The OpenJDK API documentation.
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 2
 %patch0
-%patch7
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 cp %{SOURCE4} .
 
 %build
-# How many cpu's do we have?
-export NUM_PROC=`/usr/bin/getconf _NPROCESSORS_ONLN 2> /dev/null || :`
-export NUM_PROC=${NUM_PROC:-1}
-
 
 # Build IcedTea and OpenJDK.
 %ifarch sparc64 alpha
@@ -374,28 +367,22 @@ export ARCH_DATA_MODEL=64
 export CFLAGS="$CFLAGS -mieee"
 %endif
 ./autogen.sh
-./configure %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
-  --with-pkgversion=rhel-%{release}-%{_arch} --enable-pulse-java \
-  --with-abs-install-dir=%{_jvmdir}/%{sdkdir} \
-  --with-rhino --with-parallel-jobs=$NUM_PROC --disable-lcms2  --disable-system-lcms
+%configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE1} \
+  --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} %{systemtapopt} \
+  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos \
+  --disable-lcms2  --disable-system-lcms
 
-make patch
+make %{?_smp_mflags} patch
 
 patch -l -p0 < %{PATCH3}
 patch -l -p0 < %{PATCH4}
-patch -l -p0 < %{PATCH8}
 
 %if %{debug}
 patch -l -p0 < %{PATCH5}
 patch -l -p0 < %{PATCH6}
 %endif
 
-
-
-%if %{gcjbootstrap}
-make stamps/patch-ecj.stamp
-%endif
-make %{debugbuild}
+make %{?_smp_mflags} %{debugbuild}
 
 %ifarch %{jit_arches}
 chmod 644 $(pwd)/%{buildoutputdir}/j2sdk-image/lib/sa-jdi.jar
@@ -409,7 +396,7 @@ pushd java-access-bridge-%{accessver}
   patch -l -p1 < %{PATCH2}
   OLD_PATH=$PATH
   export PATH=$JAVA_HOME/bin:$OLD_PATH
-  ./configure
+  %configure
   make
   export PATH=$OLD_PATH
   cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
@@ -879,6 +866,24 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 24 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:1.13.1-1
+- Make package buildable on F16/17
+- Turn on gcj bootstrap
+- Use upstream OpenJDK tarball
+- Split systemtap option from bootstrap option
+- Change name to IcedTea
+- Fix versioning
+- Drop unneeded patch name prefixing
+- Backport build fixes from 1.13 branch (system LCMS and -Werror)
+- Add missing build requirements, based on Gentoo
+- Remove VisualVM build requirements
+- Drop runtime Rhino requirement
+- Add runtime Gtk2 requirement for look-and-feel
+- Use configure macro and allow it to detect parallelism itself
+- Explicitly turn off downloading and turn on NSS and system Kerberos
+- Pass _smp_mflags to make
+- Drop unneeded patch-ecj call
+
 * Thu Jan 23 2014 Jiri Vanek <jvanek@redhat.com> - 1:1.6.0.1-3.1.13.0
 - updated to icedtea 1.13.1
  - http://blog.fuseyism.com/index.php/2014/01/23/security-icedtea-1-12-8-1-13-1-for-openjdk-6-released/
@@ -974,7 +979,7 @@ exit 0
   to remove   6664509 and 7201064 from 1.11.6 tarball
 - Resolves: rhbz#906708
 
-* Sun Feb 04 2013 Jiri Vanek <jvanek@redhat.com> - 1:1.6.0.0-1.51.1.11.6
+* Mon Feb 04 2013 Jiri Vanek <jvanek@redhat.com> - 1:1.6.0.0-1.51.1.11.6
 - Updated to icedtea6 1.11.6
 - Rewritten java-1.6.0-openjdk-java-access-bridge-security.patch 
 - Access gnome bridge jar is forced to have 644 permissions
