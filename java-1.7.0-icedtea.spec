@@ -6,12 +6,18 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 1.13.1
+%define icedteaver 2.3.14
 %define icedteasnapshot %{nil}
-%define openjdkver b30
-%define openjdkdate 21_jan_2014
 
 %define icedteaurl http://icedtea.classpath.org/
+
+%define corbachangeset c7d0b72f704f
+%define jaxpchangeset 0eb202593710
+%define jaxwschangeset 482a3f64a8ea
+%define jdkchangeset 3428bff8a33a
+%define langtoolschangeset d50a9c5cd291
+%define openjdkchangeset 14181eb6c00d
+%define hotspotchangeset 72a544aeb892
 
 %define accessmajorver 1.23
 %define accessminorver 0
@@ -83,7 +89,7 @@
 %endif
 
 %if %{gcjbootstrap}
-%define bootstrapopt %{nil}
+%define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9}
 %else
 %define bootstrapopt --disable-bootstrap
 %endif
@@ -108,8 +114,7 @@
 # Standard JPackage naming and versioning defines.
 %define origin          icedtea
 %define priority        16000
-%define javaver         1.6.0
-%define buildver        0
+%define javaver         1.7.0
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
@@ -165,30 +170,16 @@ Group:   Development/Languages
 
 License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, MPLv1.0, MPLv1.1, Public Domain, W3C
 URL:      http://icedtea.classpath.org/
-Source0:  %{icedteaurl}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.xz
-# To generate, download OpenJDK tarball from %{openjdkurl},
-# and run %{SOURCE3} on the tarball.
-Source1:  %{openjdkzip}
-Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.bz2
-Source4:  README.src
-
-# Pre-2009 changelog, retained to ensure contributions are not lost
-SOURCE900: pre-2009-spec-changelog
-
-# FIXME: This patch needs to be fixed. optflags argument
-# -mtune=generic is being ignored because it breaks several graphical
-# applications.
-Patch0:   optflags.patch
-Patch1:   java-access-bridge-tck.patch
-Patch2:   java-access-bridge-idlj.patch
-Patch3:	  java-access-bridge-security.patch
-Patch4:   accessible-toolkit.patch
-Patch5:   debugdocs.patch
-Patch6:   debuginfo.patch
-Patch7:   1.13.1-post-version_bump.patch
-Patch8:   1.13.1-post-jdk_generic_profile_fix.patch
-Patch9:   1.13.1-post-auto_disable_system_lcms.patch
-Patch10:   1.13.1-post-werror.patch
+Source0:  %{icedteaurl}download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
+Source1:  README.src
+Source2:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{openjdkchangeset}.tar.gz
+Source3:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{corbachangeset}.tar.gz
+Source4:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxpchangeset}.tar.gz
+Source5:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxwschangeset}.tar.gz
+Source6:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jdkchangeset}.tar.gz
+Source7:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{hotspotchangeset}.tar.gz
+Source8:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{langtoolschangeset}.tar.gz
+Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -210,19 +201,23 @@ BuildRequires: zlib-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
 BuildRequires: giflib-devel
+BuildRequires: lcms2-devel >= 2.5
 BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: ant
+%if 0%{?fedora} < 20
 BuildRequires: ant-nodeps
+%endif
 BuildRequires: rhino
 BuildRequires: redhat-lsb
 BuildRequires: nss-devel
 BuildRequires: krb5-devel
+BuildRequires: libattr-devel
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 BuildRequires: libxslt
 %else
-BuildRequires: java-1.6.0-openjdk-devel
+BuildRequires: java-1.6.0-icedtea-devel
 %endif
 # Java Access Bridge for GNOME build requirements.
 BuildRequires: at-spi-devel
@@ -237,8 +232,6 @@ BuildRequires: pulseaudio >= 0.9.11
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
-
-ExclusiveArch: x86_64 i686
 
 # cacerts build requirement.
 BuildRequires: openssl
@@ -284,6 +277,18 @@ Provides: jce = %{epoch}:%{version}
 Provides: jdbc-stdext = 3.0
 Provides: java-sasl = %{epoch}:%{version}
 Provides: java-fonts = %{epoch}:%{version}
+
+# Obsolete older OpenJDK 1.6 & 1.7 packages
+Obsoletes: java-1.6.0-openjdk
+Obsoletes: java-1.6.0-openjdk-demo
+Obsoletes: java-1.6.0-openjdk-devel
+Obsoletes: java-1.6.0-openjdk-javadoc
+Obsoletes: java-1.6.0-openjdk-src
+Obsoletes: java-1.7.0-openjdk
+Obsoletes: java-1.7.0-openjdk-demo
+Obsoletes: java-1.7.0-openjdk-devel
+Obsoletes: java-1.7.0-openjdk-javadoc
+Obsoletes: java-1.7.0-openjdk-src
 
 %description
 The OpenJDK runtime environment.
@@ -347,40 +352,19 @@ Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 The OpenJDK API documentation.
 
 %prep
-%setup -q -n icedtea6-%{icedteaver}
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 2
-%patch0
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
+%setup -q -n icedtea-%{icedteaver}
 
-cp %{SOURCE4} .
+cp %{SOURCE1} .
 
 %build
 
 # Build IcedTea and OpenJDK.
-%ifarch sparc64 alpha
-export ARCH_DATA_MODEL=64
-%endif
-%ifarch alpha
-export CFLAGS="$CFLAGS -mieee"
-%endif
-./autogen.sh
-%configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE1} \
+%configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE2} \
+  --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
+  --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
+  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
   --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} %{systemtapopt} \
-  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos \
-  --disable-lcms2  --disable-system-lcms
-
-make %{?_smp_mflags} patch
-
-patch -l -p0 < %{PATCH3}
-patch -l -p0 < %{PATCH4}
-
-%if %{debug}
-patch -l -p0 < %{PATCH5}
-patch -l -p0 < %{PATCH6}
-%endif
+  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -389,21 +373,6 @@ chmod 644 $(pwd)/%{buildoutputdir}/j2sdk-image/lib/sa-jdi.jar
 %endif
 
 export JAVA_HOME=$(pwd)/%{buildoutputdir}/j2sdk-image
-
-# Build Java Access Bridge for GNOME.
-pushd java-access-bridge-%{accessver}
-  patch -l -p1 < %{PATCH1}
-  patch -l -p1 < %{PATCH2}
-  OLD_PATH=$PATH
-  export PATH=$JAVA_HOME/bin:$OLD_PATH
-  %configure
-  make
-  export PATH=$OLD_PATH
-  cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
-  chmod 644 gnome-java-bridge.jar
-  cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
-popd
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -646,6 +615,7 @@ alternatives \
   --slave %{_bindir}/javadoc javadoc %{sdkbindir}/javadoc \
   --slave %{_bindir}/javah javah %{sdkbindir}/javah \
   --slave %{_bindir}/javap javap %{sdkbindir}/javap \
+  --slave %{_bindir}/jcmd jcmd %{sdkbindir}/jcmd \
   --slave %{_bindir}/jconsole jconsole %{sdkbindir}/jconsole \
   --slave %{_bindir}/jdb jdb %{sdkbindir}/jdb \
   --slave %{_bindir}/jhat jhat %{sdkbindir}/jhat \
@@ -683,6 +653,8 @@ alternatives \
   %{_mandir}/man1/javah-%{name}.1$ext \
   --slave %{_mandir}/man1/javap.1$ext javap.1$ext \
   %{_mandir}/man1/javap-%{name}.1$ext \
+  --slave %{_mandir}/man1/jcmd.1$ext jcmd.1$ext \
+  %{_mandir}/man1/jcmd-%{name}.1$ext \
   --slave %{_mandir}/man1/jconsole.1$ext jconsole.1$ext \
   %{_mandir}/man1/jconsole-%{name}.1$ext \
   --slave %{_mandir}/man1/jdb.1$ext jdb.1$ext \
@@ -768,7 +740,7 @@ exit 0
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
 %doc %{buildoutputdir}/j2sdk-image/jre/THIRD_PARTY_README
 # FIXME: The TRADEMARK file should be in j2sdk-image.
-%doc openjdk/TRADEMARK
+%doc openjdk/jaxp/TRADEMARK
 %doc AUTHORS
 %doc COPYING
 %doc ChangeLog
@@ -783,7 +755,7 @@ exit 0
 %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security.old
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
@@ -794,7 +766,6 @@ exit 0
 %{_mandir}/man1/servertool-%{name}.1*
 %{_mandir}/man1/tnameserv-%{name}.1*
 %{_mandir}/man1/unpack200-%{name}.1*
-%{_jvmdir}/%{jredir}/lib/security/nss.cfg
 
 %files devel
 %defattr(-,root,root,-)
@@ -803,7 +774,7 @@ exit 0
 #%doc %{buildoutputdir}/j2sdk-image/README.html
 %doc %{buildoutputdir}/j2sdk-image/THIRD_PARTY_README
 # FIXME: The TRADEMARK file should be in j2sdk-image.
-%doc openjdk/TRADEMARK
+%doc openjdk/jaxp/TRADEMARK
 %dir %{_jvmdir}/%{sdkdir}/bin
 %dir %{_jvmdir}/%{sdkdir}/include
 %dir %{_jvmdir}/%{sdkdir}/lib
@@ -830,6 +801,7 @@ exit 0
 %{_mandir}/man1/javadoc-%{name}.1*
 %{_mandir}/man1/javah-%{name}.1*
 %{_mandir}/man1/javap-%{name}.1*
+%{_mandir}/man1/jcmd-%{name}.1*
 %{_mandir}/man1/jconsole-%{name}.1*
 %{_mandir}/man1/jdb-%{name}.1*
 %{_mandir}/man1/jhat-%{name}.1*
@@ -866,6 +838,20 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Mar 27 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.3.14-1
+- Adapt to 2.3.14
+- Bootstrap using native ecj from gcj, to avoid buggy versions on recent Fedoras
+- Drop all patches, including outdated accessibility layer
+- Add new forest changeset IDs and URLs
+- Depend on lcms2 and libattr-devel
+- Only depend on ant-nodeps on F19 and older
+- Use java-1.6.0-icedtea-devel for non-bootstrap builds
+- Remove ExclusiveArch restriction
+- Obsolete old java-1.x.0-openjdk packages
+- Add jcmd binary and man page
+- Fix path to TRADEMARK file
+- Remove java.security.old (not in 2.x) and add nss.cfg as config file
+
 * Mon Mar 24 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:1.13.1-1
 - Make package buildable on F16/17
 - Turn on gcj bootstrap
