@@ -6,30 +6,27 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 2.3.14
+%define icedteaver 2.4.6
 %define icedteasnapshot %{nil}
 
-%define icedteaurl http://icedtea.classpath.org/
+%define icedteaurl http://icedtea.classpath.org
+%define openjdkurl http://hg.openjdk.java.net
 
-%define corbachangeset c7d0b72f704f
-%define jaxpchangeset 0eb202593710
-%define jaxwschangeset 482a3f64a8ea
-%define jdkchangeset 3428bff8a33a
-%define langtoolschangeset d50a9c5cd291
-%define openjdkchangeset 14181eb6c00d
-%define hotspotchangeset 72a544aeb892
+%define corbachangeset 48ef1bb6d120
+%define jaxpchangeset e0ba4b9a8b91
+%define jaxwschangeset 4bd947cd146b
+%define jdkchangeset b5282042aae0
+%define langtoolschangeset 06eeb77dac24
+%define openjdkchangeset b028e58c1b77
+%define hotspotchangeset 172674e0ab65
+%define aarch64changeset f50993b6c38d
 
-%define accessmajorver 1.23
-%define accessminorver 0
-%define accessver %{accessmajorver}.%{accessminorver}
-%define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
-
-%define openjdkurl https://java.net/downloads/openjdk6/
-%define openjdkzip  openjdk-6-src-%{openjdkver}-%{openjdkdate}.tar.xz
+%global aarch64 aarch64 arm64 armv8
 
 %define multilib_arches ppc64 sparc64 x86_64
-
-%define jit_arches %{ix86} x86_64 sparcv9 sparc64
+%define jit_arches %{aarch64} %{ix86} x86_64 sparcv9 sparc64
+%define sa_arches %{ix86} x86_64 sparcv9 sparc64
+%define noprelink_arches %{aarch64}
 
 %ifarch x86_64
 %define archbuild amd64
@@ -69,6 +66,10 @@
 %define archbuild sparcv9
 %define archinstall sparcv9
 %endif
+%ifarch %{aarch64}
+%global archbuild aarch64
+%global archinstall aarch64
+%endif
 %ifnarch %{jit_arches}
 %define archbuild %{_arch}
 %define archinstall %{_arch}
@@ -82,16 +83,16 @@
 
 %define buildoutputdir openjdk.build
 
-%ifarch %{jit_arches}
-%define systemtapopt --enable-systemtap
-%else
-%define systemtapopt %{nil}
-%endif
-
 %if %{gcjbootstrap}
 %define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9}
 %else
 %define bootstrapopt --disable-bootstrap
+%endif
+
+%ifarch %{aarch64}
+%define hotspottarball %{SOURCE10}
+%else
+%define hotspottarball %{SOURCE7}
 %endif
 
 # Convert an absolute path to a relative path.  Each symbolic link is
@@ -154,7 +155,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -170,7 +171,7 @@ Group:   Development/Languages
 
 License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, MPLv1.0, MPLv1.1, Public Domain, W3C
 URL:      http://icedtea.classpath.org/
-Source0:  %{icedteaurl}download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
+Source0:  %{icedteaurl}/download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
 Source1:  README.src
 Source2:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{openjdkchangeset}.tar.gz
 Source3:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{corbachangeset}.tar.gz
@@ -180,6 +181,7 @@ Source6:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jdkch
 Source7:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{hotspotchangeset}.tar.gz
 Source8:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{langtoolschangeset}.tar.gz
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
+Source10: %{openjdkurl}/aarch64-port/jdk7u/hotspot/archive/%{aarch64changeset}.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -236,7 +238,9 @@ BuildRequires: libffi-devel
 # cacerts build requirement.
 BuildRequires: openssl
 # execstack build requirement.
+%ifnarch %{noprelink_arches}
 BuildRequires: prelink
+%endif
 %ifarch %{jit_arches}
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
@@ -362,13 +366,14 @@ cp %{SOURCE1} .
 %configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE2} \
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
-  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
-  --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} %{systemtapopt} \
-  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos
+  --with-hotspot-src-zip=%{hotspottarball} --with-langtools-src-zip=%{SOURCE8} \
+  --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} \
+  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos \
+  --enable-arm32-jit
 
 make %{?_smp_mflags} %{debugbuild}
 
-%ifarch %{jit_arches}
+%ifarch %{sa_arches}
 chmod 644 $(pwd)/%{buildoutputdir}/j2sdk-image/lib/sa-jdi.jar
 %endif
 
@@ -463,10 +468,12 @@ pushd %{buildoutputdir}/j2sdk-image
   cp -a sample $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
 
   # Run execstack on libjvm.so.
-  %ifarch i386 i686
-    execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/client/libjvm.so
-  %endif
+  %ifnarch %{noprelink_arches}
+    %ifarch i386 i686
+      execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/client/libjvm.so
+    %endif
   execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so
+  %endif
 
 popd
 
@@ -756,6 +763,8 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
@@ -838,6 +847,21 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Mar 27 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.4.6-1
+- Adapt to 2.4.6
+- Remove accessibility and OpenJDK 6 definitions
+- Add aarch64 definitions
+- Add aarch64 to jit_arches
+- Define sa_arches as jit_arches excluding aarch64
+- Define noprelink_arches as aarch64
+- Drop systemtap option
+- Use different HotSpot tarball for aarch64
+- Enable the ARM32 JIT
+- Only depend on prelink for archs not in noprelink_arches
+- Only install sa-jdi.jar on sa_arches
+- Only run execstack for archs not in prelink_arches
+- Add policies to config
+
 * Thu Mar 27 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.3.14-1
 - Adapt to 2.3.14
 - Bootstrap using native ecj from gcj, to avoid buggy versions on recent Fedoras
