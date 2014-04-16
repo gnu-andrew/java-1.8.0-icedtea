@@ -6,19 +6,19 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 2.4.6
+%define icedteaver 2.4.7
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 
-%define corbachangeset 48ef1bb6d120
-%define jaxpchangeset e0ba4b9a8b91
-%define jaxwschangeset 4bd947cd146b
-%define jdkchangeset b5282042aae0
-%define langtoolschangeset 06eeb77dac24
-%define openjdkchangeset b028e58c1b77
-%define hotspotchangeset 172674e0ab65
+%define corbachangeset e6ad5b912691
+%define jaxpchangeset 94b7e8e0d96f
+%define jaxwschangeset bd9a50a78d04
+%define jdkchangeset 9448fff93286
+%define langtoolschangeset 8c26a3c39128
+%define openjdkchangeset 13970e76b784
+%define hotspotchangeset 69b542696e5b
 %define aarch64changeset f50993b6c38d
 
 %global aarch64 aarch64 arm64 armv8
@@ -847,6 +847,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Apr 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.4.7-1
+- Update to 2.4.7
+
 * Thu Mar 27 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.4.6-1
 - Adapt to 2.4.6
 - Remove accessibility and OpenJDK 6 definitions
