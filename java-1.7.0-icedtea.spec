@@ -6,19 +6,19 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 2.4.7
+%define icedteaver 2.6pre04
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 
-%define corbachangeset e6ad5b912691
-%define jaxpchangeset 94b7e8e0d96f
-%define jaxwschangeset bd9a50a78d04
-%define jdkchangeset 9448fff93286
-%define langtoolschangeset 8c26a3c39128
-%define openjdkchangeset 13970e76b784
-%define hotspotchangeset 69b542696e5b
+%define corbachangeset d99431d571f8
+%define jaxpchangeset c3178eab3782
+%define jaxwschangeset 95bbd42cadc9
+%define jdkchangeset b69f22ae0ef3
+%define langtoolschangeset fa084876cf02
+%define openjdkchangeset 9f06098d4daa
+%define hotspotchangeset 2fd819c8b506
 %define aarch64changeset f50993b6c38d
 
 %global aarch64 aarch64 arm64 armv8
@@ -84,7 +84,11 @@
 %define buildoutputdir openjdk.build
 
 %if %{gcjbootstrap}
+%if 0%{?fedora} < 21
 %define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9}
+%else
+%define bootstrapopt %{nil}
+%endif
 %else
 %define bootstrapopt --disable-bootstrap
 %endif
@@ -185,8 +189,6 @@ Source10: %{openjdkurl}/aarch64-port/jdk7u/hotspot/archive/%{aarch64changeset}.t
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: autoconf
-BuildRequires: automake
 BuildRequires: alsa-lib-devel
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
@@ -213,10 +215,15 @@ BuildRequires: ant-nodeps
 BuildRequires: rhino
 BuildRequires: redhat-lsb
 BuildRequires: nss-devel
+BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 BuildRequires: krb5-devel
 BuildRequires: libattr-devel
 %if %{gcjbootstrap}
+%if 0%{?fedora} < 21
 BuildRequires: java-1.5.0-gcj-devel
+%else
+BuildRequires: java-1.7.0-openjdk-devel
+%endif
 BuildRequires: libxslt
 %else
 BuildRequires: java-1.6.0-icedtea-devel
@@ -369,7 +376,7 @@ cp %{SOURCE1} .
   --with-hotspot-src-zip=%{hotspottarball} --with-langtools-src-zip=%{SOURCE8} \
   --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} \
   --disable-downloading --with-rhino --enable-nss --enable-system-kerberos \
-  --enable-arm32-jit
+  --enable-arm32-jit --enable-sunec
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -847,6 +854,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon May 12 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6pre04-1
+- Allow builds on rawhide with SunEC provider
+
 * Wed Apr 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.4.7-1
 - Update to 2.4.7
 
