@@ -22,11 +22,13 @@
 %define aarch64changeset f50993b6c38d
 
 %global aarch64 aarch64 arm64 armv8
+%global ppc64le	ppc64le
+%global ppc64be	ppc64 ppc64p7
 
-%define multilib_arches ppc64 sparc64 x86_64
-%define jit_arches %{aarch64} %{ix86} x86_64 sparcv9 sparc64
+%define multilib_arches %{ppc64be} sparc64 x86_64
+%define jit_arches %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
 %define sa_arches %{ix86} x86_64 sparcv9 sparc64
-%define noprelink_arches %{aarch64}
+%define noprelink_arches %{aarch64} %{ppc64le}
 
 %ifarch x86_64
 %define archbuild amd64
@@ -36,7 +38,7 @@
 %define archbuild ppc
 %define archinstall ppc
 %endif
-%ifarch ppc64
+%ifarch %{power64}
 %define archbuild ppc64
 %define archinstall ppc64
 %endif
@@ -159,7 +161,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -854,6 +856,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu May 15 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6pre04-2
+- Support ppc64le JIT
+
 * Mon May 12 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6pre04-1
 - Allow builds on rawhide with SunEC provider
 
