@@ -6,11 +6,14 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 2.6pre04
+%define icedteabranch 2.5
+%define icedteaver %{icedteabranch}.2
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
+%define dropurl %{icedteaurl}/download/drops
+%define repourl %{dropurl}/icedtea7/%{icedteaver}
 
 %define corbachangeset d99431d571f8
 %define jaxpchangeset c3178eab3782
@@ -161,7 +164,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 2%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -179,15 +182,15 @@ License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, M
 URL:      http://icedtea.classpath.org/
 Source0:  %{icedteaurl}/download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
 Source1:  README.src
-Source2:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{openjdkchangeset}.tar.gz
-Source3:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{corbachangeset}.tar.gz
-Source4:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxpchangeset}.tar.gz
-Source5:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxwschangeset}.tar.gz
-Source6:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jdkchangeset}.tar.gz
-Source7:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{hotspotchangeset}.tar.gz
-Source8:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{langtoolschangeset}.tar.gz
+Source2:  %{repourl}/openjdk.tar.bz2#/openjdk-%{openjdkchangeset}.tar.bz2
+Source3:  %{repourl}/corba.tar.bz2#/corba-%{corbachangeset}.tar.bz2
+Source4:  %{repourl}/jaxp.tar.bz2#/jaxp-%{jaxpchangeset}.tar.bz2
+Source5:  %{repourl}/jaxws.tar.bz2#/jaxws-%{jaxwschangeset}.tar.bz2
+Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
+Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
+Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
-Source10: %{openjdkurl}/aarch64-port/jdk7u/hotspot/archive/%{aarch64changeset}.tar.gz
+Source10: %{dropurl}/aarch64/%{icedteaver}/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -856,6 +859,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
+- Update to 2.5.2 and use new URLs.
+
 * Thu May 15 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6pre04-2
 - Support ppc64le JIT
 
