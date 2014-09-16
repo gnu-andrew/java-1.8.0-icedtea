@@ -8,23 +8,23 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteabranch 2.5
-%define icedteaver %{icedteabranch}.2
-%define icedteasnapshot %{nil}
+%define icedteabranch 2.6
+%define icedteaver %{icedteabranch}.0
+%define icedteasnapshot pre08
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea7/%{icedteaver}
 
-%define corbachangeset 06663e4cfbbe
-%define jaxpchangeset d77720c6a36f
-%define jaxwschangeset aac78bd724c4
-%define jdkchangeset 1e6a8564aa34
-%define langtoolschangeset f444e2a77643
-%define openjdkchangeset de1fbcb08558
-%define hotspotchangeset 4ad43b271fd4
-%define aarch64changeset a03843f2ff15
+%define corbachangeset a756dcabdae6
+%define jaxpchangeset fbc3c0ab4c1d
+%define jaxwschangeset 646981c9ac47
+%define jdkchangeset 9702c7936ed8
+%define langtoolschangeset cdf407c97754
+%define openjdkchangeset df23e3760506
+%define hotspotchangeset 6d5ec408f4ca
+%define aarch64changeset f50993b6c38d
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -182,7 +182,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 3%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -208,9 +208,7 @@ Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
 Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
 Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
-#Source10: %{dropurl}/aarch64/%{icedteaver}/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
-#Temporarily hardcoded to 2.5.1
-Source10: %{dropurl}/aarch64/2.5.1/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
+Source10: %{dropurl}/aarch64/%{icedteaver}/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -887,6 +885,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com>
+- Update to 2.6.0pre08.
+
 * Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
 - Adapt to work on RHEL 7.
 
