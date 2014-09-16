@@ -1,7 +1,9 @@
-# If gcjbootstrap is 1 IcedTea is bootstrapped against
-# java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
+# If bootstrap is 1, OpenJDK is bootstrapped against
+# java-1.5.0-gcj-devel (or java-1.6.0-openjdk-devel if
+# gcj is unavailable), then rebuilt with itself.
+# If bootstrap is 0, OpenJDK is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 1
+%define bootstrap 1
 
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
@@ -80,6 +82,22 @@
 %define archinstall %{_arch}
 %endif
 
+%if 0%{?fedora}
+%if 0%{?fedora} < 21
+%define havegcj 1
+%else
+%define havegcj 0
+%endif
+%else
+%if 0%{?rhel}
+%if 0%{?rhel} < 7
+%define havegcj 1
+%else
+%define havegcj 0
+%endif
+%endif
+%endif
+
 %if %{debug}
 %define debugbuild icedtea-debug
 %else
@@ -88,8 +106,8 @@
 
 %define buildoutputdir openjdk.build
 
-%if %{gcjbootstrap}
-%if 0%{?fedora} < 21
+%if %{bootstrap}
+%if %{havegcj}
 %define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9}
 %else
 %define bootstrapopt %{nil}
@@ -216,8 +234,16 @@ BuildRequires: lcms2-devel >= 2.5
 BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: ant
+%if 0%{?fedora}
 %if 0%{?fedora} < 20
 BuildRequires: ant-nodeps
+%endif
+%else
+%if 0%{?rhel}
+%if 0%{?rhel} < 7
+BuildRequires: ant-nodeps
+%endif
+%endif
 %endif
 BuildRequires: rhino
 BuildRequires: redhat-lsb
@@ -225,11 +251,11 @@ BuildRequires: nss-devel
 BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 BuildRequires: krb5-devel
 BuildRequires: libattr-devel
-%if %{gcjbootstrap}
-%if 0%{?fedora} < 21
+%if %{bootstrap}
+%if %{havegcj}
 BuildRequires: java-1.5.0-gcj-devel
 %else
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: java-1.6.0-openjdk-devel
 %endif
 BuildRequires: libxslt
 %else
@@ -861,6 +887,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
+- Adapt to work on RHEL 7.
+
 * Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
 - Use correct changesets and fix AArch64 URL.
 
