@@ -1,25 +1,30 @@
-# If gcjbootstrap is 1 IcedTea is bootstrapped against
-# java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
+# If bootstrap is 1, OpenJDK is bootstrapped against
+# java-1.5.0-gcj-devel (or java-1.6.0-openjdk-devel if
+# gcj is unavailable), then rebuilt with itself.
+# If bootstrap is 0, OpenJDK is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 1
+%define bootstrap 1
 
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-%define icedteaver 2.6pre04
+%define icedteabranch 2.5
+%define icedteaver %{icedteabranch}.2
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
+%define dropurl %{icedteaurl}/download/drops
+%define repourl %{dropurl}/icedtea7/%{icedteaver}
 
-%define corbachangeset d99431d571f8
-%define jaxpchangeset c3178eab3782
-%define jaxwschangeset 95bbd42cadc9
-%define jdkchangeset b69f22ae0ef3
-%define langtoolschangeset fa084876cf02
-%define openjdkchangeset 9f06098d4daa
-%define hotspotchangeset 2fd819c8b506
-%define aarch64changeset f50993b6c38d
+%define corbachangeset 06663e4cfbbe
+%define jaxpchangeset d77720c6a36f
+%define jaxwschangeset aac78bd724c4
+%define jdkchangeset 1e6a8564aa34
+%define langtoolschangeset f444e2a77643
+%define openjdkchangeset de1fbcb08558
+%define hotspotchangeset 4ad43b271fd4
+%define aarch64changeset a03843f2ff15
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -77,6 +82,22 @@
 %define archinstall %{_arch}
 %endif
 
+%if 0%{?fedora}
+%if 0%{?fedora} < 21
+%define havegcj 1
+%else
+%define havegcj 0
+%endif
+%else
+%if 0%{?rhel}
+%if 0%{?rhel} < 7
+%define havegcj 1
+%else
+%define havegcj 0
+%endif
+%endif
+%endif
+
 %if %{debug}
 %define debugbuild icedtea-debug
 %else
@@ -85,8 +106,8 @@
 
 %define buildoutputdir openjdk.build
 
-%if %{gcjbootstrap}
-%if 0%{?fedora} < 21
+%if %{bootstrap}
+%if %{havegcj}
 %define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9}
 %else
 %define bootstrapopt %{nil}
@@ -161,7 +182,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 2%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -179,15 +200,17 @@ License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, M
 URL:      http://icedtea.classpath.org/
 Source0:  %{icedteaurl}/download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
 Source1:  README.src
-Source2:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{openjdkchangeset}.tar.gz
-Source3:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{corbachangeset}.tar.gz
-Source4:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxpchangeset}.tar.gz
-Source5:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jaxwschangeset}.tar.gz
-Source6:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{jdkchangeset}.tar.gz
-Source7:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{hotspotchangeset}.tar.gz
-Source8:  %{icedteaurl}/hg/release/icedtea7-forest-%{icedteaver}/archive/%{langtoolschangeset}.tar.gz
+Source2:  %{repourl}/openjdk.tar.bz2#/openjdk-%{openjdkchangeset}.tar.bz2
+Source3:  %{repourl}/corba.tar.bz2#/corba-%{corbachangeset}.tar.bz2
+Source4:  %{repourl}/jaxp.tar.bz2#/jaxp-%{jaxpchangeset}.tar.bz2
+Source5:  %{repourl}/jaxws.tar.bz2#/jaxws-%{jaxwschangeset}.tar.bz2
+Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
+Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
+Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
-Source10: %{openjdkurl}/aarch64-port/jdk7u/hotspot/archive/%{aarch64changeset}.tar.gz
+#Source10: %{dropurl}/aarch64/%{icedteaver}/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
+#Temporarily hardcoded to 2.5.1
+Source10: %{dropurl}/aarch64/2.5.1/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -211,8 +234,16 @@ BuildRequires: lcms2-devel >= 2.5
 BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: ant
+%if 0%{?fedora}
 %if 0%{?fedora} < 20
 BuildRequires: ant-nodeps
+%endif
+%else
+%if 0%{?rhel}
+%if 0%{?rhel} < 7
+BuildRequires: ant-nodeps
+%endif
+%endif
 %endif
 BuildRequires: rhino
 BuildRequires: redhat-lsb
@@ -220,11 +251,11 @@ BuildRequires: nss-devel
 BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 BuildRequires: krb5-devel
 BuildRequires: libattr-devel
-%if %{gcjbootstrap}
-%if 0%{?fedora} < 21
+%if %{bootstrap}
+%if %{havegcj}
 BuildRequires: java-1.5.0-gcj-devel
 %else
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: java-1.6.0-openjdk-devel
 %endif
 BuildRequires: libxslt
 %else
@@ -856,6 +887,15 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
+- Adapt to work on RHEL 7.
+
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
+- Use correct changesets and fix AArch64 URL.
+
+* Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.5.2-1
+- Update to 2.5.2 and use new URLs.
+
 * Thu May 15 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6pre04-2
 - Support ppc64le JIT
 
