@@ -10,21 +10,21 @@
 
 %define icedteabranch 2.6
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre08
+%define icedteasnapshot pre09
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea7/%{icedteaver}
 
-%define corbachangeset a756dcabdae6
-%define jaxpchangeset fbc3c0ab4c1d
-%define jaxwschangeset 646981c9ac47
-%define jdkchangeset 9702c7936ed8
-%define langtoolschangeset cdf407c97754
-%define openjdkchangeset df23e3760506
-%define hotspotchangeset 6d5ec408f4ca
-%define aarch64changeset f50993b6c38d
+%define corbachangeset 4e8ca30ec092
+%define jaxpchangeset f59ee5163710
+%define jaxwschangeset 39dd7bed2325
+%define jdkchangeset 1ceeb31e72ca
+%define langtoolschangeset 55486a406d9f
+%define openjdkchangeset 7faf56bdd783
+%define hotspotchangeset 4722cfd15c83
+%define aarch64changeset 5b7dcf16fe5d
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -184,7 +184,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 3%{?dist}
+Release: 4%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -210,7 +210,7 @@ Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
 Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
 Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
-Source10: %{dropurl}/aarch64/%{icedteaver}/hotspot.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
+Source10: %{repourl}/aarch64.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -887,6 +887,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Oct 31 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-4
+- Update to 2.6.0pre09.
+
 * Tue Sep 16 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-3
 - Use /usr/lib/jvm/java-1.6.0 until java-1.6.0-openjdk is provided (RH1143771)
 - Include icedteasnapshot in tarball extraction name
