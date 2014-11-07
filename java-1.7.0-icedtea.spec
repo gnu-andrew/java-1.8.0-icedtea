@@ -112,7 +112,11 @@
 %if %{havegcj}
 %define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9} --with-jdk-home=/usr/lib/jvm/java-1.5.0-gcj
 %else
+%ifarch %{aarch64}
+%define bootstrapopt --with-jdk-home=/usr/lib/jvm/java-1.7.0-openjdk
+%else
 %define bootstrapopt --with-jdk-home=/usr/lib/jvm/java-1.6.0
+%endif
 %endif
 %else
 %define bootstrapopt --disable-bootstrap
@@ -255,7 +259,11 @@ BuildRequires: libattr-devel
 %if %{havegcj}
 BuildRequires: java-1.5.0-gcj-devel
 %else
+%ifarch %{aarch64}
+BuildRequires: java-1.7.0-openjdk-devel
+%else
 BuildRequires: java-1.6.0-openjdk-devel
+%endif
 %endif
 BuildRequires: libxslt
 %else
@@ -407,9 +415,8 @@ cp %{SOURCE1} .
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-hotspot-src-zip=%{hotspottarball} --with-langtools-src-zip=%{SOURCE8} \
-  --enable-pulse-java --with-abs-install-dir=%{_jvmdir}/%{sdkdir} \
-  --disable-downloading --with-rhino --enable-nss --enable-system-kerberos \
-  --enable-arm32-jit --enable-sunec
+  --prefix=%{_jvmdir}/%{sdkdir} --disable-downloading --with-rhino \
+  --enable-system-kerberos --enable-arm32-jit --enable-sunec
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -887,6 +894,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Nov 07 2014 Andrew Hughes <gnu.andrew@redhat.com> - 1:2.6.0-4
+- Use java-1.7.0-openjdk for AArch64 as it does not have 1.6.
+- Update to use --prefix option to configure instead of arch-install-dir.
+- Drop --enable-nss and obsolete --enable-pulse-java.
+
 * Fri Oct 31 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-4
 - Update to 2.6.0pre09.
 
