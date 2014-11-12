@@ -10,21 +10,20 @@
 
 %define icedteabranch 2.6
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre10
+%define icedteasnapshot pre11
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea7/%{icedteaver}
 
-%define corbachangeset 1a346ad4e322
-%define jaxpchangeset 603009854864
-%define jaxwschangeset 70a94bce8d6e
-%define jdkchangeset 33a33bbea1ae
-%define langtoolschangeset cf836e0ed10d
-%define openjdkchangeset 200124c2f78d
-%define hotspotchangeset c8417820ac94
-%define aarch64changeset 5b7dcf16fe5d
+%define corbachangeset c11c54a2675c
+%define jaxpchangeset 79d217da0a7a
+%define jaxwschangeset 2823343ab244
+%define jdkchangeset 8a445d1b5af5
+%define langtoolschangeset 510234036e06
+%define openjdkchangeset 05e485acec14
+%define hotspotchangeset e13857ecc787
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -122,12 +121,6 @@
 %define bootstrapopt --disable-bootstrap
 %endif
 
-%ifarch %{aarch64}
-%define hotspottarball %{SOURCE10}
-%else
-%define hotspottarball %{SOURCE7}
-%endif
-
 # Convert an absolute path to a relative path.  Each symbolic link is
 # specified relative to the directory in which it is installed so that
 # it will resolve properly within chrooted installations.
@@ -188,7 +181,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -214,7 +207,6 @@ Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
 Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
 Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
 Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
-Source10: %{repourl}/aarch64.tar.bz2#/aarch64-%{aarch64changeset}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -414,7 +406,7 @@ cp %{SOURCE1} .
 %configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE2} \
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
-  --with-hotspot-src-zip=%{hotspottarball} --with-langtools-src-zip=%{SOURCE8} \
+  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
   --prefix=%{_jvmdir}/%{sdkdir} --disable-downloading --with-rhino \
   --enable-system-kerberos --enable-arm32-jit --enable-sunec
 
@@ -894,6 +886,10 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Nov 11 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-6
+- Update to 2.6.0pre11.
+- No more need for AArch64-specific tarballs.
+
 * Fri Nov 07 2014 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-5
 - Update to 2.6.0pre10.
 
