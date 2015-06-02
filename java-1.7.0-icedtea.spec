@@ -329,7 +329,7 @@ BuildRequires: java-1.6.0-openjdk-devel
 %endif
 BuildRequires: libxslt
 %else
-BuildRequires: java-1.6.0-icedtea-devel
+BuildRequires: java-1.7.0-openjdk-devel
 %endif
 # Java Access Bridge for GNOME build requirements.
 BuildRequires: at-spi-devel
@@ -956,6 +956,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Jun 02 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-9
+- Change no bootstrap JDK to java-1.7.0-openjdk-devel
+
 * Tue Jun 02 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-9
 - Avoid doing a full bootstrap on Zero architectures due to timeout
 
