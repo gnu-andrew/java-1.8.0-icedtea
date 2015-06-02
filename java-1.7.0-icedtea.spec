@@ -1,13 +1,3 @@
-# If bootstrap is 1, OpenJDK is bootstrapped against
-# java-1.5.0-gcj-devel (or java-1.6.0-openjdk-devel if
-# gcj is unavailable), then rebuilt with itself.
-# If bootstrap is 0, OpenJDK is built against
-# java-1.6.0-openjdk-devel.
-%define bootstrap 1
-
-# If debug is 1, a debug build of OpenJDK is performed.
-%define debug 0
-
 %define icedteabranch 2.6
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot pre20
@@ -34,6 +24,7 @@
 %define sa_arches %{ix86} x86_64 sparcv9 sparc64
 %define noprelink_arches %{aarch64} %{ppc64le}
 %define no6_arches %{aarch64} %{ppc64le}
+%define zero_arches ppc s390 s390x
 
 %ifarch x86_64
 %define archbuild amd64
@@ -81,6 +72,20 @@
 %define archbuild %{_arch}
 %define archinstall %{_arch}
 %endif
+
+# If bootstrap is 1, OpenJDK is bootstrapped against
+# java-1.5.0-gcj-devel (or java-1.6.0-openjdk-devel if
+# gcj is unavailable), then rebuilt with itself.
+# If bootstrap is 0, OpenJDK is built against
+# java-1.6.0-openjdk-devel.
+%ifarch %{zero_arches}
+%define bootstrap 0
+%else
+%define bootstrap 1
+%endif
+
+# If debug is 1, a debug build of OpenJDK is performed.
+%define debug 0
 
 # Define havegcj to 1 if the platform has gcj
 # RHEL 5 & 6 do, Fedora prior to version 21 does
@@ -951,6 +956,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Jun 02 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-9
+- Avoid doing a full bootstrap on Zero architectures due to timeout
+
 * Tue Jun 02 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-9
 - Generalise architectures without OpenJDK 6 to no6_arches
 
