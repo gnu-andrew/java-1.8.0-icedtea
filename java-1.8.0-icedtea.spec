@@ -14,22 +14,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 2.6
+%define icedteabranch 3.0
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre21
+%define icedteasnapshot pre04
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
-%define repourl %{dropurl}/icedtea7/%{icedteaver}
+%define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 0cc5634fda95
-%define jaxpchangeset 522863522a4d
-%define jaxwschangeset 231ef27a86e2
-%define jdkchangeset 533e9029af35
-%define langtoolschangeset 5331b041c889
-%define openjdkchangeset 513069c9fc20
-%define hotspotchangeset 1939c010fd37
+%define corbachangeset b493e7b682c9
+%define jaxpchangeset c62dd685e517
+%define jaxwschangeset db7fdb068af9
+%define jdkchangeset 8450ad6fa3f5
+%define langtoolschangeset 66f265db6f47
+%define openjdkchangeset 0503e9c58a13
+%define nashornchangeset bb36d4894aa4
+%define hotspotchangeset 7e5a87c79d69
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -90,10 +91,9 @@
 %endif
 
 # If bootstrap is 1, OpenJDK is bootstrapped against
-# java-1.5.0-gcj-devel (or java-1.6.0-openjdk-devel if
-# gcj is unavailable), then rebuilt with itself.
+# java-1.7.0-openjdk-devel, then rebuilt with itself.
 # If bootstrap is 0, OpenJDK is built against
-# java-1.6.0-openjdk-devel.
+# java-1.7.0-openjdk-devel.
 %ifarch %{zero_arches}
 %define bootstrap 0
 %else
@@ -103,26 +103,9 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-# Define havegcj to 1 if the platform has gcj
-# RHEL 5 & 6 do, Fedora prior to version 21 does
-%if 0%{?fedora}
-%if 0%{?fedora} < 21
-%define havegcj 1
-%else
-%define havegcj 0
-%endif
-%else
-%if 0%{?rhel}
 %if 0%{?rhel} < 7
-%define havegcj 1
 # Fake native2ascii for RHEL as it isn't included
 %define native2ascii --with-native2ascii=/bin/true
-%else
-%define havegcj 0
-%endif
-%else
-%define havegcj 1
-%endif
 %endif
 
 # Define havelcms2 to 1 if the platform has lcms2
@@ -150,27 +133,6 @@
 %define havesunecnss 1
 %endif
 
-# Define havesplitant to 1 if the platform splits Ant
-# into ant and ant-nodeps packages. This is true of Fedora
-# prior to version 20 and RHEL prior to version 7.
-%if 0%{?fedora}
-%if 0%{?fedora} < 20
-%define havesplitant 1
-%else
-%define havesplitant 0
-%endif
-%else
-%if 0%{?rhel}
-%if 0%{?rhel} < 7
-%define havesplitant 1
-%else
-%define havesplitant 0
-%endif
-%else
-%define havesplitant 0
-%endif
-%endif
-
 %if %{debug}
 %define debugbuild icedtea-debug
 %else
@@ -180,15 +142,7 @@
 %define buildoutputdir openjdk.build
 
 %if %{bootstrap}
-%if %{havegcj}
-%define bootstrapopt --with-gcj --with-ecj-jar=%{SOURCE9} --with-jdk-home=/usr/lib/jvm/java-1.5.0-gcj %{native2ascii}
-%else
-%ifarch %{no6_arches}
 %define bootstrapopt --with-jdk-home=/usr/lib/jvm/java-1.7.0-openjdk
-%else
-%define bootstrapopt --with-jdk-home=/usr/lib/jvm/java-1.6.0
-%endif
-%endif
 %else
 %define bootstrapopt --disable-bootstrap
 %endif
@@ -219,7 +173,7 @@
 # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
 # simply be another alternative.
 %ifarch %{multilib_arches}
-%define syslibdir       %{_prefix}/lib64
+%define syslibdir	%{_prefix}/lib64
 %define _libdir         %{_prefix}/lib
 %define archname        %{name}.%{_arch}
 %else
@@ -230,7 +184,7 @@
 # Standard JPackage naming and versioning defines.
 %define origin          icedtea
 %define priority        16000
-%define javaver         1.7.0
+%define javaver         1.8.0
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
@@ -270,7 +224,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 10%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -288,14 +242,14 @@ License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, M
 URL:      http://icedtea.classpath.org/
 Source0:  %{icedteaurl}/download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
 Source1:  README.src
-Source2:  %{repourl}/openjdk.tar.bz2#/openjdk-%{openjdkchangeset}.tar.bz2
-Source3:  %{repourl}/corba.tar.bz2#/corba-%{corbachangeset}.tar.bz2
-Source4:  %{repourl}/jaxp.tar.bz2#/jaxp-%{jaxpchangeset}.tar.bz2
-Source5:  %{repourl}/jaxws.tar.bz2#/jaxws-%{jaxwschangeset}.tar.bz2
-Source6:  %{repourl}/jdk.tar.bz2#/jdk-%{jdkchangeset}.tar.bz2
-Source7:  %{repourl}/hotspot.tar.bz2#/hotspot-%{hotspotchangeset}.tar.bz2
-Source8:  %{repourl}/langtools.tar.bz2#/langtools-%{langtoolschangeset}.tar.bz2
-Source9:  ftp://ftp@sourceware.org/pub/java/ecj-4.5.jar
+Source2:  %{repourl}/openjdk.tar.xz#/openjdk-%{openjdkchangeset}.tar.xz
+Source3:  %{repourl}/corba.tar.xz#/corba-%{corbachangeset}.tar.xz
+Source4:  %{repourl}/jaxp.tar.xz#/jaxp-%{jaxpchangeset}.tar.xz
+Source5:  %{repourl}/jaxws.tar.xz#/jaxws-%{jaxwschangeset}.tar.xz
+Source6:  %{repourl}/jdk.tar.xz#/jdk-%{jdkchangeset}.tar.xz
+Source7:  %{repourl}/hotspot.tar.xz#/hotspot-%{hotspotchangeset}.tar.xz
+Source8:  %{repourl}/langtools.tar.xz#/langtools-%{langtoolschangeset}.tar.xz
+Source9:  %{repourl}/nashorn.tar.xz#nashorn-%{nashornchangeset}.tar.xz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -320,41 +274,19 @@ BuildRequires: lcms2-devel >= 2.5
 %endif
 BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
-BuildRequires: ant
-%if %{havesplitant}
-BuildRequires: ant-nodeps
-%endif
-BuildRequires: rhino
 BuildRequires: redhat-lsb
 %if %{havesunecnss}
 BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 %endif
 BuildRequires: nss-devel
-BuildRequires: krb5-devel
 BuildRequires: libattr-devel
-%if %{bootstrap}
-%if %{havegcj}
-BuildRequires: java-1.5.0-gcj-devel
-%else
-%ifarch %{no6_arches}
 BuildRequires: java-1.7.0-openjdk-devel
-%else
-BuildRequires: java-1.6.0-openjdk-devel
-%endif
-%endif
-BuildRequires: libxslt
-%else
-BuildRequires: java-1.7.0-openjdk-devel
-%endif
 # Java Access Bridge for GNOME build requirements.
 BuildRequires: at-spi-devel
 BuildRequires: gawk
 BuildRequires: libbonobo-devel
 BuildRequires: pkgconfig >= 0.9.0
 BuildRequires: xorg-x11-utils
-# PulseAudio build requirements.
-BuildRequires: pulseaudio-libs-devel >= 0.9.11
-BuildRequires: pulseaudio >= 0.9.11
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
@@ -406,18 +338,6 @@ Provides: jce = %{epoch}:%{version}
 Provides: jdbc-stdext = 3.0
 Provides: java-sasl = %{epoch}:%{version}
 Provides: java-fonts = %{epoch}:%{version}
-
-# Obsolete older OpenJDK 1.6 & 1.7 packages
-Obsoletes: java-1.6.0-openjdk
-Obsoletes: java-1.6.0-openjdk-demo
-Obsoletes: java-1.6.0-openjdk-devel
-Obsoletes: java-1.6.0-openjdk-javadoc
-Obsoletes: java-1.6.0-openjdk-src
-Obsoletes: java-1.7.0-openjdk
-Obsoletes: java-1.7.0-openjdk-demo
-Obsoletes: java-1.7.0-openjdk-devel
-Obsoletes: java-1.7.0-openjdk-javadoc
-Obsoletes: java-1.7.0-openjdk-src
 
 %description
 The OpenJDK runtime environment.
@@ -488,12 +408,13 @@ cp %{SOURCE1} .
 %build
 
 # Build IcedTea and OpenJDK.
-%configure %{bootstrapopt} --with-openjdk-src-zip=%{SOURCE2} \
-  --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
-  --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
-  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
-  --prefix=%{_jvmdir}/%{sdkdir} --disable-downloading --with-rhino \
-  --enable-system-kerberos --enable-arm32-jit %{ecopt} %{lcmsopt}
+%configure %{bootstrapopt} --prefix=%{_jvmdir}/%{sdkdir} \
+  --mandir=%{_jvmdir}/%{sdkdir}/man --docdir=%{_javadocdir}/%{name} \
+  --with-openjdk-src-zip=%{SOURCE2} --with-corba-src-zip=%{SOURCE3} \
+  --with-jaxp-src-zip=%{SOURCE4} --with-jaxws-src-zip=%{SOURCE5} \
+  --with-jdk-src-zip=%{SOURCE6} --with-hotspot-src-zip=%{SOURCE7} \
+  --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} \
+  --disable-downloading %{ecopt} %{lcmsopt}
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -501,119 +422,76 @@ make %{?_smp_mflags} %{debugbuild}
 chmod 644 $(pwd)/%{buildoutputdir}/j2sdk-image/lib/sa-jdi.jar
 %endif
 
-export JAVA_HOME=$(pwd)/%{buildoutputdir}/j2sdk-image
-
 %install
 rm -rf $RPM_BUILD_ROOT
 STRIP_KEEP_SYMTAB=libjvm*
 
-pushd %{buildoutputdir}/j2sdk-image
+%make_install
 
-  # Install main files.
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  cp -a bin include lib src.zip $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
-  cp -a jre/bin jre/lib $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
-
-%ifarch %{jit_arches}
-  # Install systemtap support files.
-  cp -a tapset $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
-  pushd $RPM_BUILD_ROOT%{tapsetdir}
-    RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
-    ln -sf $RELATIVE/*.stp .
-  popd
-%endif
-
-  # Install cacerts symlink.
-  rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
-  pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security
-    RELATIVE=$(%{abs2rel} %{_sysconfdir}/pki/java \
-      %{_jvmdir}/%{jredir}/lib/security)
-    ln -sf $RELATIVE/cacerts .
-  popd
-
-  # Install extension symlinks.
-  install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
-  pushd $RPM_BUILD_ROOT%{jvmjardir}
-    RELATIVE=$(%{abs2rel} %{_jvmdir}/%{jredir}/lib %{jvmjardir})
-    ln -sf $RELATIVE/jsse.jar jsse-%{version}.jar
-    ln -sf $RELATIVE/jce.jar jce-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jndi-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jndi-ldap-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jndi-cos-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jndi-rmi-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jaas-%{version}.jar
-    ln -sf $RELATIVE/rt.jar jdbc-stdext-%{version}.jar
-    ln -sf jdbc-stdext-%{version}.jar jdbc-stdext-3.0.jar
-    ln -sf $RELATIVE/rt.jar sasl-%{version}.jar
-    for jar in *-%{version}.jar
-    do
-      if [ x%{version} != x%{javaver} ]
-      then
-        ln -sf $jar $(echo $jar | sed "s|-%{version}.jar|-%{javaver}.jar|g")
-      fi
-      ln -sf $jar $(echo $jar | sed "s|-%{version}.jar|.jar|g")
-    done
-  popd
-
-  # Install JCE policy symlinks.
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
-
-  # Install versionless symlinks.
-  pushd $RPM_BUILD_ROOT%{_jvmdir}
-    ln -sf %{jredir} %{jrelnk}
-    ln -sf %{sdkdir} %{sdklnk}
-  popd
-
-  pushd $RPM_BUILD_ROOT%{_jvmjardir}
-    ln -sf %{sdkdir} %{jrelnk}
-    ln -sf %{sdkdir} %{sdklnk}
-  popd
-
-  # Remove javaws man page
-  rm -f man/man1/javaws*
-
-  # Install man pages.
-  install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/man1
-  for manpage in man/man1/*
-  do
-    # Convert man pages to UTF8 encoding.
-    iconv -f ISO_8859-1 -t UTF8 $manpage -o $manpage.tmp
-    mv -f $manpage.tmp $manpage
-    install -m 644 -p $manpage $RPM_BUILD_ROOT%{_mandir}/man1/$(basename \
-      $manpage .1)-%{name}.1
-  done
-
-  # Install demos and samples.
-  cp -a demo $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  mkdir -p sample/rmi
-  mv bin/java-rmi.cgi sample/rmi
-  cp -a sample $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-
-  # Run execstack on libjvm.so.
-  %ifnarch %{noprelink_arches}
-    %ifarch i386 i686
-      execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/client/libjvm.so
-    %endif
-  execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so
-  %endif
-
+# Install cacerts symlink.
+rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
+pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security
+  RELATIVE=$(%{abs2rel} %{_sysconfdir}/pki/java \
+    %{_jvmdir}/%{jredir}/lib/security)
+  ln -sf $RELATIVE/cacerts .
 popd
 
-# Install Javadoc documentation.
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}
-cp -a %{buildoutputdir}/docs $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+# Install extension symlinks.
+install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
+pushd $RPM_BUILD_ROOT%{jvmjardir}
+  RELATIVE=$(%{abs2rel} %{_jvmdir}/%{jredir}/lib %{jvmjardir})
+  ln -sf $RELATIVE/jsse.jar jsse-%{version}.jar
+  ln -sf $RELATIVE/jce.jar jce-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jndi-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jndi-ldap-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jndi-cos-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jndi-rmi-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jaas-%{version}.jar
+  ln -sf $RELATIVE/rt.jar jdbc-stdext-%{version}.jar
+  ln -sf jdbc-stdext-%{version}.jar jdbc-stdext-3.0.jar
+  ln -sf $RELATIVE/rt.jar sasl-%{version}.jar
+  for jar in *-%{version}.jar
+  do
+    if [ x%{version} != x%{javaver} ]
+    then
+      ln -sf $jar $(echo $jar | sed "s|-%{version}.jar|-%{javaver}.jar|g")
+    fi
+    ln -sf $jar $(echo $jar | sed "s|-%{version}.jar|.jar|g")
+  done
+popd
 
-# Install icons and menu entries.
-for s in 16 24 32 48 ; do
-  install -D -p -m 644 \
-    openjdk/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
-    $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
+# Install JCE policy symlinks.
+install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
+
+# Install versionless symlinks.
+pushd %{buildroot}%{_jvmdir}
+  ln -sf %{jredir} %{jrelnk}
+  ln -sf %{sdkdir} %{sdklnk}
+popd
+
+pushd %{buildroot}%{_jvmjardir}
+  ln -sf %{sdkdir} %{jrelnk}
+  ln -sf %{sdkdir} %{sdklnk}
+popd
+
+# Install man pages.
+for manpage in %{buildroot}man/man1/*
+do
+  # Convert man pages to UTF8 encoding.
+  iconv -f ISO_8859-1 -t UTF8 $manpage -o $manpage.tmp
+  mv -f $manpage.tmp $manpage
+  install -m 644 -p $manpage $RPM_BUILD_ROOT%{_mandir}/man1/$(basename $manpage .1)-%{name}.1
 done
 
+# Run execstack on libjvm.so.
+%ifnarch %{noprelink_arches}
+  %ifarch i386 i686
+    execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/client/libjvm.so
+  %endif
+execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so
+%endif
+
 # Install desktop files.
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
 for e in jconsole policytool ; do
     desktop-file-install --vendor=%{name} --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
@@ -971,6 +849,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jun 08 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-0
+- Update to 3.0.0pre04.
+
 * Wed Jun 03 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:2.6.0-10
 - Update to 2.6.0pre21.
 
