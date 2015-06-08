@@ -1,4 +1,4 @@
-java-1.7.0-icedtea
+java-1.8.0-icedtea
 ==================
 
-Java 1.7.0 support for Fedora via IcedTea
+Java 1.8.0 support for RPM-based systems via IcedTea
