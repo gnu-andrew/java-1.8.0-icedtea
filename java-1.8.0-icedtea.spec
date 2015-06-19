@@ -206,7 +206,6 @@
 %define jvmjardir       %{_jvmjardir}/%{name}-%{version}
 %endif
 
-%ifarch %{jit_arches}
 # Where to install systemtap tapset (links)
 # We would like these to be in a package specific subdir,
 # but currently systemtap doesn't support that, so we have to
@@ -217,7 +216,6 @@
 # aka build_cpu as architecture specific directory name.
 #%define tapsetdir	/usr/share/systemtap/tapset/%{sdkdir}
 %define tapsetdir	/usr/share/systemtap/tapset/%{_build_cpu}
-%endif
 
 # Prevent brp-java-repack-jars from being run.
 %define __jar_repack 0
@@ -249,7 +247,7 @@ Source5:  %{repourl}/jaxws.tar.xz#/jaxws-%{jaxwschangeset}.tar.xz
 Source6:  %{repourl}/jdk.tar.xz#/jdk-%{jdkchangeset}.tar.xz
 Source7:  %{repourl}/hotspot.tar.xz#/hotspot-%{hotspotchangeset}.tar.xz
 Source8:  %{repourl}/langtools.tar.xz#/langtools-%{langtoolschangeset}.tar.xz
-Source9:  %{repourl}/nashorn.tar.xz#nashorn-%{nashornchangeset}.tar.xz
+Source9:  %{repourl}/nashorn.tar.xz#/nashorn-%{nashornchangeset}.tar.xz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -298,10 +296,8 @@ BuildRequires: openssl
 %ifnarch %{noprelink_arches}
 BuildRequires: prelink
 %endif
-%ifarch %{jit_arches}
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
-%endif
 
 Requires: fontconfig
 Requires: libjpeg = 6b
@@ -408,25 +404,29 @@ cp %{SOURCE1} .
 %build
 
 # Build IcedTea and OpenJDK.
-%configure %{bootstrapopt} --prefix=%{_jvmdir}/%{sdkdir} \
-  --mandir=%{_jvmdir}/%{sdkdir}/man --docdir=%{_javadocdir}/%{name} \
-  --with-openjdk-src-zip=%{SOURCE2} --with-corba-src-zip=%{SOURCE3} \
-  --with-jaxp-src-zip=%{SOURCE4} --with-jaxws-src-zip=%{SOURCE5} \
-  --with-jdk-src-zip=%{SOURCE6} --with-hotspot-src-zip=%{SOURCE7} \
-  --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} \
-  --disable-downloading %{ecopt} %{lcmsopt}
+%configure %{bootstrapopt} --prefix=%{_jvmdir}/%{sdkdir} --exec-prefix=%{_jvmdir}/%{sdkdir} \
+  --bindir=%{_jvmdir}/%{sdkdir}/bin --includedir=%{_jvmdir}/%{sdkdir}/include \
+  --docdir=%{_defaultdocdir}/%{name} --mandir=%{_jvmdir}/%{sdkdir}/man \
+  --htmldir=%{_javadocdir}/%{name} --with-openjdk-src-zip=%{SOURCE2} \
+  --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
+  --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
+  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
+  --with-nashorn-src-zip=%{SOURCE9} --disable-downloading %{ecopt} %{lcmsopt}
 
-make %{?_smp_mflags} %{debugbuild}
-
-%ifarch %{sa_arches}
-chmod 644 $(pwd)/%{buildoutputdir}/j2sdk-image/lib/sa-jdi.jar
-%endif
+make %{?_smp_mflags} LDFLAGS= %{debugbuild}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 STRIP_KEEP_SYMTAB=libjvm*
 
 %make_install
+
+# Install systemtap support symlinks.
+install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
+pushd $RPM_BUILD_ROOT%{tapsetdir}
+  RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
+  ln -sf $RELATIVE/*.stp .
+popd
 
 # Install cacerts symlink.
 rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
@@ -475,20 +475,24 @@ pushd %{buildroot}%{_jvmjardir}
 popd
 
 # Install man pages.
-for manpage in %{buildroot}man/man1/*
+install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/man1
+for manpage in %{buildroot}%{_jvmdir}/%{sdkdir}/man/man1/*
 do
   # Convert man pages to UTF8 encoding.
   iconv -f ISO_8859-1 -t UTF8 $manpage -o $manpage.tmp
   mv -f $manpage.tmp $manpage
   install -m 644 -p $manpage $RPM_BUILD_ROOT%{_mandir}/man1/$(basename $manpage .1)-%{name}.1
 done
+# Delete the man pages installed by IcedTea so RPM doesn't complain
+rm -rf %{buildroot}%{_jvmdir}/%{sdkdir}/man
 
 # Run execstack on libjvm.so.
 %ifnarch %{noprelink_arches}
-  %ifarch i386 i686
-    execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/client/libjvm.so
-  %endif
-execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/server/libjvm.so
+  for vms in client server ; do
+    if [ -d $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/${vms} ] ; then
+	execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/${vms}/libjvm.so
+    fi ;
+  done
 %endif
 
 # Install desktop files.
@@ -745,17 +749,10 @@ exit 0
 
 %files -f %{name}.files
 %defattr(-,root,root,-)
-%doc %{buildoutputdir}/j2sdk-image/jre/ASSEMBLY_EXCEPTION
-%doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
-%doc %{buildoutputdir}/j2sdk-image/jre/THIRD_PARTY_README
-# FIXME: The TRADEMARK file should be in j2sdk-image.
-%doc openjdk/jaxp/TRADEMARK
-%doc AUTHORS
-%doc COPYING
-%doc ChangeLog
-%doc NEWS
-%doc README
+%docdir %{_defaultdocdir}/%{name}
+%{_defaultdocdir}/%{name}
 %dir %{_jvmdir}/%{sdkdir}
+%{_jvmdir}/%{sdkdir}/release
 %{_jvmdir}/%{jrelnk}
 %{_jvmjardir}/%{jrelnk}
 %{_jvmprivdir}/*
@@ -767,7 +764,8 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
-%{_datadir}/icons/hicolor/*x*/apps/java.png
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklisted.certs
+%{_datadir}/icons/hicolor/*x*/apps/java-%{javaver}.png
 %{_mandir}/man1/java-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
 %{_mandir}/man1/orbd-%{name}.1*
@@ -780,30 +778,19 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
-%doc %{buildoutputdir}/j2sdk-image/ASSEMBLY_EXCEPTION
-%doc %{buildoutputdir}/j2sdk-image/LICENSE
-#%doc %{buildoutputdir}/j2sdk-image/README.html
-%doc %{buildoutputdir}/j2sdk-image/THIRD_PARTY_README
-# FIXME: The TRADEMARK file should be in j2sdk-image.
-%doc openjdk/jaxp/TRADEMARK
 %dir %{_jvmdir}/%{sdkdir}/bin
 %dir %{_jvmdir}/%{sdkdir}/include
 %dir %{_jvmdir}/%{sdkdir}/lib
-%ifarch %{jit_arches}
 %dir %{_jvmdir}/%{sdkdir}/tapset
-%endif
 %{_jvmdir}/%{sdkdir}/bin/*
 %{_jvmdir}/%{sdkdir}/include/*
 %{_jvmdir}/%{sdkdir}/lib/*
-%ifarch %{jit_arches}
 %{_jvmdir}/%{sdkdir}/tapset/*.stp
-%endif
 %{_jvmdir}/%{sdklnk}
 %{_jvmjardir}/%{sdklnk}
 %{_datadir}/applications/*jconsole.desktop
 %{_datadir}/applications/*policytool.desktop
 %{_mandir}/man1/appletviewer-%{name}.1*
-%{_mandir}/man1/apt-%{name}.1*
 %{_mandir}/man1/extcheck-%{name}.1*
 %{_mandir}/man1/idlj-%{name}.1*
 %{_mandir}/man1/jar-%{name}.1*
@@ -814,9 +801,11 @@ exit 0
 %{_mandir}/man1/javap-%{name}.1*
 %{_mandir}/man1/jcmd-%{name}.1*
 %{_mandir}/man1/jconsole-%{name}.1*
+%{_mandir}/man1/jdeps-%{name}.1*
 %{_mandir}/man1/jdb-%{name}.1*
 %{_mandir}/man1/jhat-%{name}.1*
 %{_mandir}/man1/jinfo-%{name}.1*
+%{_mandir}/man1/jjs-%{name}.1*
 %{_mandir}/man1/jmap-%{name}.1*
 %{_mandir}/man1/jps-%{name}.1*
 %{_mandir}/man1/jrunscript-%{name}.1*
@@ -832,9 +821,7 @@ exit 0
 %{_mandir}/man1/wsgen-%{name}.1*
 %{_mandir}/man1/wsimport-%{name}.1*
 %{_mandir}/man1/xjc-%{name}.1*
-%ifarch %{jit_arches}
 %{tapsetdir}/*.stp
-%endif
 
 %files demo -f %{name}-demo.files
 %defattr(-,root,root,-)
@@ -849,6 +836,20 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Jun 19 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-0
+- Remove conditionals around tapset rules as they are always present in IcedTea
+- Fix Nashorn URL
+- Override more configure paths to ensure correct installation
+- Set LDFLAGS empty until PR2428 is fixed
+- Drop permission change to sa-jdi.jar as no longer needed.
+- Bring back SystemTap symlink installation.
+- Create directory for man pages and remove the IcedTea installed directory afterwards.
+- Do execstack call using existence test, not an arch test.
+- Point RPM to docs installed by IcedTea rather than installing its own.
+- Install release and blacklisted.certs
+- Fix path of icons installed by IcedTea.
+- Drop apt man page and add ones for jdeps and jjs.
+
 * Mon Jun 08 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-0
 - Update to 3.0.0pre04.
 
