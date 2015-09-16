@@ -16,21 +16,21 @@
 
 %define icedteabranch 3.0
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre04
+%define icedteasnapshot pre05
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset b493e7b682c9
-%define jaxpchangeset c62dd685e517
-%define jaxwschangeset db7fdb068af9
-%define jdkchangeset 8450ad6fa3f5
-%define langtoolschangeset 66f265db6f47
-%define openjdkchangeset 0503e9c58a13
-%define nashornchangeset bb36d4894aa4
-%define hotspotchangeset 7e5a87c79d69
+%define corbachangeset a5ec6d805e38
+%define jaxpchangeset 792da500df0d
+%define jaxwschangeset 561f103796e5
+%define jdkchangeset d64c0a9b8b5a
+%define langtoolschangeset 811deb5a72d3
+%define openjdkchangeset 44d6e4ff3770
+%define nashornchangeset f78a53946897
+%define hotspotchangeset b07272ef9ccd
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -222,7 +222,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -413,7 +413,7 @@ cp %{SOURCE1} .
   --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
   --with-nashorn-src-zip=%{SOURCE9} --disable-downloading %{ecopt} %{lcmsopt}
 
-make %{?_smp_mflags} LDFLAGS= %{debugbuild}
+make %{?_smp_mflags} %{debugbuild}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -836,6 +836,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Sep 16 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-1
+- Update to 3.0.0pre05.
+
 * Fri Jun 19 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-0
 - Remove conditionals around tapset rules as they are always present in IcedTea
 - Fix Nashorn URL
