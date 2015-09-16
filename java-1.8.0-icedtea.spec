@@ -100,6 +100,14 @@
 %define bootstrap 1
 %endif
 
+%if 0%{?fedora} > 21
+%define bootstrap_jdk java-1.8.0-openjdk-devel
+%define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk
+%else
+%define bootstrap_jdk java-1.7.0-openjdk-devel
+%define bootstrap_path /usr/lib/jvm/java-1.7.0-openjdk
+%endif
+
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
@@ -142,7 +150,7 @@
 %define buildoutputdir openjdk.build
 
 %if %{bootstrap}
-%define bootstrapopt --with-jdk-home=/usr/lib/jvm/java-1.7.0-openjdk
+%define bootstrapopt --with-jdk-home=%{bootstrap_path}
 %else
 %define bootstrapopt --disable-bootstrap
 %endif
@@ -278,7 +286,7 @@ BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 %endif
 BuildRequires: nss-devel
 BuildRequires: libattr-devel
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: %{bootstrap_jdk}
 # Java Access Bridge for GNOME build requirements.
 BuildRequires: at-spi-devel
 BuildRequires: gawk
@@ -836,6 +844,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Sep 16 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-1
+- Allow bootstrap JDK to be java-1.8.0-openjdk on Fedora 21 and above.
+
 * Wed Sep 16 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-1
 - Update to 3.0.0pre05.
 
