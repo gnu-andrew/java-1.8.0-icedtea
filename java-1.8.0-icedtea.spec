@@ -222,7 +222,7 @@
 # specific dir (note that systemtap will only pickup the tapset
 # for the primary arch for now). Systemtap uses the machine name
 # aka build_cpu as architecture specific directory name.
-#%define tapsetdir	/usr/share/systemtap/tapset/%{sdkdir}
+#%%define tapsetdir	/usr/share/systemtap/tapset/%%{sdkdir}
 %define tapsetdir	/usr/share/systemtap/tapset/%{_build_cpu}
 
 # Prevent brp-java-repack-jars from being run.
@@ -280,17 +280,15 @@ BuildRequires: lcms2-devel >= 2.5
 %endif
 BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
-BuildRequires: redhat-lsb
+BuildRequires: freetype-devel
+# Provides lsb_release for generating distro id in jdk_generic_profile.sh
+BuildRequires: redhat-lsb-core
 %if %{havesunecnss}
 BuildRequires: nss-softokn-freebl-devel >= 3.16.1
 %endif
 BuildRequires: nss-devel
 BuildRequires: libattr-devel
 BuildRequires: %{bootstrap_jdk}
-# Java Access Bridge for GNOME build requirements.
-BuildRequires: at-spi-devel
-BuildRequires: gawk
-BuildRequires: libbonobo-devel
 BuildRequires: pkgconfig >= 0.9.0
 BuildRequires: xorg-x11-utils
 # Zero-assembler build requirement.
@@ -300,10 +298,6 @@ BuildRequires: libffi-devel
 
 # cacerts build requirement.
 BuildRequires: openssl
-# execstack build requirement.
-%ifnarch %{noprelink_arches}
-BuildRequires: prelink
-%endif
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
 
@@ -493,15 +487,6 @@ do
 done
 # Delete the man pages installed by IcedTea so RPM doesn't complain
 rm -rf %{buildroot}%{_jvmdir}/%{sdkdir}/man
-
-# Run execstack on libjvm.so.
-%ifnarch %{noprelink_arches}
-  for vms in client server ; do
-    if [ -d $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/${vms} ] ; then
-	execstack -c $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/%{archinstall}/${vms}/libjvm.so
-    fi ;
-  done
-%endif
 
 # Install desktop files.
 for e in jconsole policytool ; do
@@ -846,6 +831,11 @@ exit 0
 %changelog
 * Fri Jan 29 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-3
 - Update to 3.0.0pre08.
+
+* Wed Dec 23 2015 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-3
+- Drop unneeded accessibility and execstack requirements
+- Reduce redhat-lsb requirement to redhat-lsb-core (we just need lsb_release)
+- Fix use of variable in comment
 
 * Tue Dec 22 2015 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-2
 - Update to 3.0.0pre07.
