@@ -1,0 +1,10 @@
+# Ignore source tarballs
+icedtea-*.tar.xz
+openjdk-*.tar.xz
+corba-*.tar.xz
+jaxp-*.tar.xz
+jaxws-*.tar.xz
+jdk-*.tar.xz
+hotspot-*.tar.xz
+langtools-*.tar.xz
+nashorn-*.tar.xz
