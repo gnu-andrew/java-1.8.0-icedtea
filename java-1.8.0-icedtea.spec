@@ -491,8 +491,10 @@ rm -rf %{buildroot}%{_jvmdir}/%{sdkdir}/man
 
 # Install desktop files.
 for e in jconsole policytool ; do
-    desktop-file-install --vendor=%{name} --mode=644 \
-        --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
+    mv $RPM_BUILD_ROOT%{_datadir}/applications/$e{-%{javaver},}.desktop
+    desktop-file-install --vendor=%{name} --mode=644 --delete-original \
+        --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+	$RPM_BUILD_ROOT%{_datadir}/applications/$e.desktop
 done
 
 # Find JRE directories.
@@ -782,8 +784,8 @@ exit 0
 %{_jvmdir}/%{sdkdir}/tapset/*.stp
 %{_jvmdir}/%{sdklnk}
 %{_jvmjardir}/%{sdklnk}
-%{_datadir}/applications/*jconsole.desktop
-%{_datadir}/applications/*policytool.desktop
+%{_datadir}/applications/%{name}-jconsole.desktop
+%{_datadir}/applications/%{name}-policytool.desktop
 %{_mandir}/man1/appletviewer-%{name}.1*
 %{_mandir}/man1/extcheck-%{name}.1*
 %{_mandir}/man1/idlj-%{name}.1*
@@ -830,6 +832,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 08 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-5
+- Update handling of desktop files, following addition of version by IcedTea.
+
 * Fri Apr 08 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-5
 - Add build dependency on libXcomposite-devel.
 
