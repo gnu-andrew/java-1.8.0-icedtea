@@ -271,6 +271,7 @@ BuildRequires: libXrender-devel
 BuildRequires: libXau-devel
 BuildRequires: libXdmcp-devel
 BuildRequires: libXinerama-devel
+BuildRequires: libXcomposite-devel
 BuildRequires: zlib-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
@@ -829,6 +830,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 08 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.0.0-5
+- Add build dependency on libXcomposite-devel.
+
 * Fri Apr 08 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.0.0-5
 - Update to 3.0.0.
 
