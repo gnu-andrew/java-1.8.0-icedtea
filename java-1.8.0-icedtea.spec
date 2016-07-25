@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Red Hat, Inc.
+# Copyright (C) 2016 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -414,9 +414,14 @@ cp %{SOURCE1} .
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
-  --with-nashorn-src-zip=%{SOURCE9} --disable-downloading %{ecopt} %{lcmsopt}
+  --with-nashorn-src-zip=%{SOURCE9} --disable-downloading %{ecopt} %{lcmsopt} \
+  --disable-tests --disable-systemtap-tests
 
 make %{?_smp_mflags} %{debugbuild}
+
+%check
+
+make check
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -832,6 +837,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jul 25 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.1.0-2
+- Run make check, turning off long-running JTreg tests and broken SystemTap tests.
+
 * Fri Jul 15 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.1.0-2
 - Update to 3.1.0pre03.
 
