@@ -16,21 +16,22 @@
 
 %define icedteabranch 3.1
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre03
+%define icedteasnapshot pre04
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset d920107a9fd4
-%define jaxpchangeset 5c97913ea9f7
-%define jaxwschangeset 82ec7b3637db
-%define jdkchangeset aab729e0626a
-%define langtoolschangeset ff680965fa8c
-%define openjdkchangeset a161af8a08eb
-%define nashornchangeset 2417a5bf2b15
-%define hotspotchangeset ea6933324a7a
+%define corbachangeset b74e7245e405
+%define jaxpchangeset 0de4d7e1996f
+%define jaxwschangeset 9812eb7e305e
+%define jdkchangeset ee0b65b8fd10
+%define langtoolschangeset fc69984700e1
+%define openjdkchangeset 6517c9e186c5
+%define nashornchangeset 68145b690b18
+%define hotspotchangeset 0f47eef348e2
+%define shenandoahchangeset ec2e71f375b1
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -172,6 +173,13 @@
 %define lcmsopt --disable-system-lcms
 %endif
 
+# Use Shenandoah on x86_64
+%ifarch x86_64
+%define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
+%else
+%define hsopt --with-hotspot-src-zip=%{SOURCE7}
+%endif
+
 # Convert an absolute path to a relative path.  Each symbolic link is
 # specified relative to the directory in which it is installed so that
 # it will resolve properly within chrooted installations.
@@ -230,7 +238,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -256,6 +264,7 @@ Source6:  %{repourl}/jdk.tar.xz#/jdk-%{jdkchangeset}.tar.xz
 Source7:  %{repourl}/hotspot.tar.xz#/hotspot-%{hotspotchangeset}.tar.xz
 Source8:  %{repourl}/langtools.tar.xz#/langtools-%{langtoolschangeset}.tar.xz
 Source9:  %{repourl}/nashorn.tar.xz#/nashorn-%{nashornchangeset}.tar.xz
+Source10:  %{repourl}/shenandoah.tar.xz#/shenandoah-%{shenandoahchangeset}.tar.xz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -413,9 +422,8 @@ cp %{SOURCE1} .
   --htmldir=%{_javadocdir}/%{name} --with-openjdk-src-zip=%{SOURCE2} \
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
-  --with-hotspot-src-zip=%{SOURCE7} --with-langtools-src-zip=%{SOURCE8} \
-  --with-nashorn-src-zip=%{SOURCE9} --disable-downloading %{ecopt} %{lcmsopt} \
-  --disable-tests --disable-systemtap-tests
+  --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
+  --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -837,6 +845,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jul 25 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.1.0-3
+- Update to 3.1.0pre04, turning on Shenandoah on x86_64.
+
 * Mon Jul 25 2016 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.1.0-2
 - Run make check, turning off long-running JTreg tests and broken SystemTap tests.
 
