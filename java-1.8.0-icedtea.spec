@@ -39,10 +39,6 @@
 
 %define multilib_arches %{ppc64be} sparc64 x86_64
 %define jit_arches %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
-%define sa_arches %{ix86} x86_64 sparcv9 sparc64
-%define noprelink_arches %{aarch64} %{ppc64le}
-%define no6_arches %{aarch64} %{ppc64le}
-%define zero_arches ppc s390 s390x
 
 %ifarch x86_64
 %define archbuild amd64
@@ -95,7 +91,7 @@
 # java-1.7.0-openjdk-devel, then rebuilt with itself.
 # If bootstrap is 0, OpenJDK is built against
 # java-1.7.0-openjdk-devel.
-%ifarch %{zero_arches}
+%ifnarch %{jit_arches}
 %define bootstrap 0
 %else
 %define bootstrap 1
@@ -845,6 +841,10 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Aug 08 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.2.0-1
+- Remove unused variables sa_arches, no_prelink_arches and no6_arches.
+- Use !jit_arches rather than zero_arches, removing the latter.
+
 * Mon Aug 08 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.2.0-1
 - Update to 3.2.0pre02.
 
