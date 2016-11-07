@@ -16,21 +16,21 @@
 
 %define icedteabranch 3.2
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre02
+%define icedteasnapshot pre03
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset f85c4b0c0469
-%define jaxpchangeset b536766d32b3
-%define jaxwschangeset e681ae177494
-%define jdkchangeset 30e3b600c829
-%define langtoolschangeset 19ea84ae4992
-%define openjdkchangeset 64e0fb010639
-%define nashornchangeset 0b84d2cb4e3a
-%define hotspotchangeset ac19c2e28a51
+%define corbachangeset 459f130b3f85
+%define jaxpchangeset 11f747b59cb0
+%define jaxwschangeset 20d379a78836
+%define jdkchangeset 32c84f7d918f
+%define langtoolschangeset 5665ca5e1896
+%define openjdkchangeset 66db642828d4
+%define nashornchangeset 83a084be209b
+%define hotspotchangeset bca091274752
 %define shenandoahchangeset d0f52d39d1cd
 
 %global aarch64 aarch64 arm64 armv8
@@ -234,7 +234,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -301,6 +301,12 @@ BuildRequires: xorg-x11-utils
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
+# For obtaining Kerberos cache location
+BuildRequires: krb5-devel
+# Required for smartcard support
+BuildRequires: pcsc-lite-devel
+# Required for SCTP support
+BuildRequires: lksctp-tools-devel
 
 # cacerts build requirement.
 BuildRequires: openssl
@@ -419,7 +425,8 @@ cp %{SOURCE1} .
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
-  --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests
+  --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
+  --disable-precompiled-headers
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -841,6 +848,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Nov 07 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.2.0-2
+- Update to 3.2.0pre02.
+- Add Kerberos, SCTP and PCSC build dependencies for new features
+- Disable pre-compiled headers.
+
 * Mon Aug 08 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.2.0-1
 - Remove unused variables sa_arches, no_prelink_arches and no6_arches.
 - Use !jit_arches rather than zero_arches, removing the latter.
