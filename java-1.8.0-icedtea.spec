@@ -14,23 +14,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.2
+%define icedteabranch 3.3
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot %{nil}
+%define icedteasnapshot pre01
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 9d3757e6da35
-%define jaxpchangeset 81c2773fbb0d
-%define jaxwschangeset f57f3ddddff6
-%define jdkchangeset 0cc71de3df18
-%define langtoolschangeset a553c153d376
-%define openjdkchangeset 200203ccf4bb
-%define nashornchangeset 0fb33c8b64d1
-%define hotspotchangeset be4aeaa327f7
+%define corbachangeset fbc3183924c8
+%define jaxpchangeset 9bea504f196a
+%define jaxwschangeset b97cf465bf9f
+%define jdkchangeset 5ce54ea88194
+%define langtoolschangeset 3ab9841babb7
+%define openjdkchangeset cc0c4b0b1c3e
+%define nashornchangeset b082c0d76be4
+%define hotspotchangeset 510bf6178ea4
 %define shenandoahchangeset 24002f5b584e
 
 %global aarch64 aarch64 arm64 armv8
@@ -234,7 +234,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 3%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -848,6 +848,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Jan 13 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.3.0-0
+- Update to 3.3.0pre01.
+
 * Tue Nov 08 2016 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.2.0-3
 - Update to 3.2.0.
 
