@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Red Hat, Inc.
+# Copyright (C) 2017 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,21 @@
 
 %define icedteabranch 3.3
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre02
+%define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset b05ee049200f
-%define jaxpchangeset 6febbabbb879
-%define jaxwschangeset 7912f05c2a6d
-%define jdkchangeset 7e0b701f3ee0
-%define langtoolschangeset 26a274d91ee6
-%define openjdkchangeset 92468d1e29e3
-%define nashornchangeset c560422516c0
-%define hotspotchangeset 2a767107aa8c
+%define corbachangeset 8eb9dd5fe2fb
+%define jaxpchangeset faf1c4a9a51d
+%define jaxwschangeset 5f5237104669
+%define jdkchangeset 3642a826880b
+%define langtoolschangeset d10a13bdc98c
+%define openjdkchangeset d5760f7cce54
+%define nashornchangeset 8c0fe384c4e7
+%define hotspotchangeset 6efaf77e82a1
 %define shenandoahchangeset d9a978177779
 
 %global aarch64 aarch64 arm64 armv8
@@ -234,7 +234,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -848,6 +848,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 25 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.3.0-2
+- Update to 3.3.0.
+
 * Tue Jan 24 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.3.0-1
 - Update to 3.3.0pre02.
 
