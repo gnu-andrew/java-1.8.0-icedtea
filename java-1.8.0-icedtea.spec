@@ -102,16 +102,15 @@
 %define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk
 %else
 %define bootstrap_jdk java-1.7.0-openjdk-devel
+%if 0%{?rhel} < 7
+%define bootstrap_path /usr/lib/jvm/%{bootstrap_name}
+%else
 %define bootstrap_path /usr/lib/jvm/java-1.7.0-openjdk
+%endif
 %endif
 
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
-
-%if 0%{?rhel} < 7
-# Fake native2ascii for RHEL as it isn't included
-%define native2ascii --with-native2ascii=/bin/true
-%endif
 
 # Define havelcms2 to 1 if the platform has lcms2
 # All supported Fedoras do as does RHEL 7
@@ -147,7 +146,7 @@
 %define buildoutputdir openjdk.build
 
 %if %{bootstrap}
-%define bootstrapopt --with-jdk-home=%{bootstrap_path}
+%define bootstrapopt %{nil}
 %else
 %define bootstrapopt --disable-bootstrap
 %endif
@@ -188,9 +187,11 @@
 %define syslibdir	%{_prefix}/lib64
 %define _libdir         %{_prefix}/lib
 %define archname        %{name}.%{_arch}
+%define bootstrap_name  java-1.7.0-openjdk.%{_arch}
 %else
 %define syslibdir       %{_libdir}
 %define archname        %{name}
+%define bootstrap_name  java-1.7.0-openjdk
 %endif
 
 # Standard JPackage naming and versioning defines.
@@ -284,7 +285,6 @@ BuildRequires: giflib-devel
 %if %{havelcms2}
 BuildRequires: lcms2-devel >= 2.5
 %endif
-BuildRequires: wget
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: freetype-devel
 # Provides lsb_release for generating distro id in jdk_generic_profile.sh
@@ -307,13 +307,16 @@ BuildRequires: krb5-devel
 BuildRequires: pcsc-lite-devel
 # Required for SCTP support
 BuildRequires: lksctp-tools-devel
+# For improved font rendering
+BuildRequires: fontconfig-devel
 
+# OpenJDK build requirement for creating src.zip
+BuildRequires: zip
 # cacerts build requirement.
 BuildRequires: openssl
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
 
-Requires: fontconfig
 Requires: libjpeg = 6b
 # Require /etc/pki/java/cacerts.
 Requires: ca-certificates
@@ -426,7 +429,7 @@ cp %{SOURCE1} .
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
   --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
-  --disable-precompiled-headers
+  --disable-precompiled-headers --enable-improved-font-rendering
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -848,6 +851,13 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 06 2017 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.3.0-2
+- Turn on improved font rendering and add fontconfig-devel dependency.
+- Depend on zip which is not automatically pulled in on RHEL 6.
+- Use auto-detection to pick up bootstrap JVM.
+- Handle arch suffix used in JDK naming on RHEL 6.
+- Remove build requirement on wget, as we do not download during build.
+
 * Wed Jan 25 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.3.0-2
 - Update to 3.3.0.
 
