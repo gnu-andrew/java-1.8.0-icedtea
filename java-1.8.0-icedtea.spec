@@ -16,22 +16,22 @@
 
 %define icedteabranch 3.4
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre01
+%define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset d812240fb576
-%define jaxpchangeset c7e590909033
-%define jaxwschangeset 30f2a833a54f
-%define jdkchangeset 5ee8253969dd
-%define langtoolschangeset a3d47fe59cc4
-%define openjdkchangeset f890a36627cc
-%define nashornchangeset 5f6a5f14b964
-%define hotspotchangeset 0bd3170be8c7
-%define shenandoahchangeset d9a978177779
+%define corbachangeset 22ed32f45405
+%define jaxpchangeset fdc2a6442d2f
+%define jaxwschangeset c1bfc2395c57
+%define jdkchangeset cfc292a2c1c6
+%define langtoolschangeset 4ef0ee927940
+%define openjdkchangeset ed5ee0ac7111
+%define nashornchangeset f2d9bca28d0e
+%define hotspotchangeset 00b7bbd261c9
+%define shenandoahchangeset 6ffe8637a506
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -43,48 +43,59 @@
 %ifarch x86_64
 %define archbuild amd64
 %define archinstall amd64
+%define haveshenandoah 1
 %endif
 %ifarch ppc
 %define archbuild ppc
 %define archinstall ppc
+%define haveshenandoah 0
 %endif
 %ifarch %{power64}
 %define archbuild ppc64
 %define archinstall ppc64
+%define haveshenandoah 0
 %endif
 %ifarch i386
 %define archbuild i586
 %define archinstall i386
+%define haveshenandoah 0
 %endif
 %ifarch i686
 %define archbuild i586
 %define archinstall i386
+%define haveshenandoah 0
 %endif
 %ifarch ia64
 %define archbuild ia64
 %define archinstall ia64
+%define haveshenandoah 0
 %endif
 %ifarch s390
 %define archbuild s390x
 %define archinstall s390x
+%define haveshenandoah 0
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
 %define archbuild sparc
 %define archinstall sparc
+%define haveshenandoah 0
 %endif
 # 64 bit sparc
 %ifarch sparc64
 %define archbuild sparcv9
 %define archinstall sparcv9
+%define haveshenandoah 0
 %endif
 %ifarch %{aarch64}
 %global archbuild aarch64
 %global archinstall aarch64
+%define haveshenandoah 1
 %endif
 %ifnarch %{jit_arches}
 %define archbuild %{_arch}
 %define archinstall %{_arch}
+%define haveshenandoah 0
 %endif
 
 # If bootstrap is 1, OpenJDK is bootstrapped against
@@ -168,8 +179,8 @@
 %define lcmsopt --disable-system-lcms
 %endif
 
-# Use Shenandoah on x86_64
-%ifarch x86_64
+# Use Shenandoah on x86_64 and aarch64
+%if %{haveshenandoah}
 %define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
 %else
 %define hsopt --with-hotspot-src-zip=%{SOURCE7}
@@ -235,7 +246,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -851,6 +862,10 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed May 10 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.4.0-1
+- Update to 3.4.0.
+- Define haveshenandoah and enable for x86_64 and aarch64.
+
 * Tue May 09 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.4.0-0
 - Update to 3.4.0pre01.
 
