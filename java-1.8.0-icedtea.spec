@@ -32,13 +32,14 @@
 %define nashornchangeset f2d9bca28d0e
 %define hotspotchangeset 00b7bbd261c9
 %define shenandoahchangeset 6ffe8637a506
+%define aarch32changeset b93c39bf2bcf
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
 %global ppc64be	ppc64 ppc64p7
 
 %define multilib_arches %{ppc64be} sparc64 x86_64
-%define jit_arches %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
+%define jit_arches %{arm} %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
 
 %ifarch x86_64
 %define archbuild amd64
@@ -85,6 +86,11 @@
 %ifarch sparc64
 %define archbuild sparcv9
 %define archinstall sparcv9
+%define haveshenandoah 0
+%endif
+%ifarch %{arm}
+%global archinstall arm
+%global stapinstall arm
 %define haveshenandoah 0
 %endif
 %ifarch %{aarch64}
@@ -183,7 +189,11 @@
 %if %{haveshenandoah}
 %define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
 %else
+%ifarch %{arm}
+%define hsopt --with-hotspot-src-zip=%{SOURCE11}
+%else
 %define hsopt --with-hotspot-src-zip=%{SOURCE7}
+%endif
 %endif
 
 # Convert an absolute path to a relative path.  Each symbolic link is
@@ -246,7 +256,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -273,6 +283,7 @@ Source7:  %{repourl}/hotspot.tar.xz#/hotspot-%{hotspotchangeset}.tar.xz
 Source8:  %{repourl}/langtools.tar.xz#/langtools-%{langtoolschangeset}.tar.xz
 Source9:  %{repourl}/nashorn.tar.xz#/nashorn-%{nashornchangeset}.tar.xz
 Source10:  %{repourl}/shenandoah.tar.xz#/shenandoah-%{shenandoahchangeset}.tar.xz
+Source11:  %{repourl}/aarch32.tar.xz#/aarch32-%{aarch32changeset}.tar.xz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -862,6 +873,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu May 11 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.4.0-2
+- Add AArch32 port support.
+
 * Wed May 10 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.4.0-1
 - Update to 3.4.0.
 - Define haveshenandoah and enable for x86_64 and aarch64.
