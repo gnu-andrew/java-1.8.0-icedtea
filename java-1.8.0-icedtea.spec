@@ -115,8 +115,13 @@
 %endif
 
 %if 0%{?fedora} > 21
+%ifarch %{arm}
+%define bootstrap_jdk java-1.8.0-openjdk-aarch32-devel
+%define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk-aarch32
+%else
 %define bootstrap_jdk java-1.8.0-openjdk-devel
 %define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk
+%endif
 %else
 %define bootstrap_jdk java-1.7.0-openjdk-devel
 %if 0%{?rhel} < 7
@@ -338,6 +343,8 @@ BuildRequires: zip
 BuildRequires: openssl
 #systemtap build requirement.
 BuildRequires: systemtap-sdt-devel
+# For javac script and SystemTap tests
+BuildRequires: perl
 
 Requires: libjpeg = 6b
 # Require /etc/pki/java/cacerts.
@@ -873,6 +880,10 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue May 16 2017 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.4.0-2
+- Use AArch32 port version for faster bootstrap.
+- Require Perl for building (used in javac.in).
+
 * Thu May 11 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.4.0-2
 - Add AArch32 port support.
 
