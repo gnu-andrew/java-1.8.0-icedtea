@@ -31,7 +31,7 @@
 %define openjdkchangeset 80ab5dd98579
 %define nashornchangeset bad6bd2d128e
 %define hotspotchangeset ecaa25cbc662
-%define shenandoahchangeset 08169421abd6
+%define shenandoahchangeset 26bb4cd21d34
 %define aarch32changeset b93c39bf2bcf
 
 %global aarch64 aarch64 arm64 armv8
@@ -880,6 +880,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Jul 28 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.5.1-0
+- Bump shenandoah to aarch64-shenandoah-jdk8u141-b16-shenandoah-merge-2017-07-27-02.
+
 * Thu Jul 27 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.5.1-0
 - Update to 3.5.1.
 
