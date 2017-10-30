@@ -14,23 +14,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.5
-%define icedteaver %{icedteabranch}.1
-%define icedteasnapshot %{nil}
+%define icedteabranch 3.6
+%define icedteaver %{icedteabranch}.0
+%define icedteasnapshot pre02
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset b5485d6bc171
-%define jaxpchangeset c8bf6508b7a5
-%define jaxwschangeset 4fb919272935
-%define jdkchangeset db0baea3a4f0
-%define langtoolschangeset 74bbbc7a8bd3
-%define openjdkchangeset 80ab5dd98579
-%define nashornchangeset bad6bd2d128e
-%define hotspotchangeset ecaa25cbc662
+%define corbachangeset 0c8bc00d9e30
+%define jaxpchangeset db1236756fea
+%define jaxwschangeset 768279d73ebb
+%define jdkchangeset 5dcb55da00c1
+%define langtoolschangeset e0f1c298f0d6
+%define openjdkchangeset 63060ee6ba74
+%define nashornchangeset add478757898
+%define hotspotchangeset 542f4e30fdff
 %define shenandoahchangeset 26bb4cd21d34
 %define aarch32changeset b93c39bf2bcf
 
@@ -880,6 +880,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Oct 30 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.6.0-0
+- Update to 3.6.0pre02.
+
 * Fri Jul 28 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.5.1-0
 - Bump shenandoah to aarch64-shenandoah-jdk8u141-b16-shenandoah-merge-2017-07-27-02.
 
