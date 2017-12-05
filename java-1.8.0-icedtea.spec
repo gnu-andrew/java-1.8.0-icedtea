@@ -806,8 +806,10 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/unlimited/US_export_policy.jar
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/unlimited/local_policy.jar
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/limited/US_export_policy.jar
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/limited/local_policy.jar
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklisted.certs
 %{_datadir}/icons/hicolor/*x*/apps/java-%{javaver}.png
 %{_mandir}/man1/java-%{name}.1*
@@ -880,6 +882,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 01 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.6.0-1
+- Update location of policy JAR files following 8157561.
+
 * Wed Nov 01 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.6.0-1
 - Update to 3.6.0.
 
