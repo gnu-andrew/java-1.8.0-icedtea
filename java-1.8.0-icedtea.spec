@@ -14,25 +14,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.6
+%define icedteabranch 3.7
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot %{nil}
+%define icedteasnapshot pre01
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 13a5a8a3c66f
-%define jaxpchangeset 947a7b1ce48b
-%define jaxwschangeset eafb356c44d0
-%define jdkchangeset a05e38417041
-%define langtoolschangeset 61a1c711f7ab
-%define openjdkchangeset eb577ed6ec93
-%define nashornchangeset a2d2fc80c97a
-%define hotspotchangeset 9bad7d4825fb
-%define shenandoahchangeset 7eeed7dc4676
-%define aarch32changeset 7b008fa0fb6d
+%define corbachangeset d3821aae5f3c
+%define jaxpchangeset e7f6617f2a85
+%define jaxwschangeset 184d3d9543ef
+%define jdkchangeset e4ff08f9c787
+%define langtoolschangeset e32341052fe1
+%define openjdkchangeset 9a7fbbe2d7ed
+%define nashornchangeset 8c6bb035cdd2
+%define hotspotchangeset c14f056eed68
+%define shenandoahchangeset 9adf5a64b23f
+%define aarch32changeset f8b1fb102364
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -261,7 +261,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -882,6 +882,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 24 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-0
+- Update to 3.7.0pre01.
+
 * Wed Nov 01 2017 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.6.0-1
 - Update location of policy JAR files following 8157561.
 
