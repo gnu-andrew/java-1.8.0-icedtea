@@ -240,9 +240,9 @@
 %define sdkbindir       %{_jvmdir}/%{sdklnk}/bin
 %define jrebindir       %{_jvmdir}/%{jrelnk}/bin
 %ifarch %{multilib_arches}
-%define jvmjardir       %{_jvmjardir}/%{name}-%{version}.%{_arch}
+%define jvmjardir       %{?_jvmjardir:%{_jvmjardir}/%{name}-%{version}.%{_arch}}
 %else
-%define jvmjardir       %{_jvmjardir}/%{name}-%{version}
+%define jvmjardir       %{?_jvmjardir:%{_jvmjardir}/%{name}-%{version}}
 %endif
 
 # Where to install systemtap tapset (links)
@@ -261,7 +261,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -488,6 +488,7 @@ pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security
 popd
 
 # Install extension symlinks.
+%{?_jvmjardir:
 install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
 pushd $RPM_BUILD_ROOT%{jvmjardir}
   RELATIVE=$(%{abs2rel} %{_jvmdir}/%{jredir}/lib %{jvmjardir})
@@ -509,7 +510,7 @@ pushd $RPM_BUILD_ROOT%{jvmjardir}
     fi
     ln -sf $jar $(echo $jar | sed "s|-%{version}.jar|.jar|g")
   done
-popd
+popd}
 
 # Install JCE policy symlinks.
 install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
@@ -520,10 +521,11 @@ pushd %{buildroot}%{_jvmdir}
   ln -sf %{sdkdir} %{sdklnk}
 popd
 
+%{?_jvmjardir:
 pushd %{buildroot}%{_jvmjardir}
   ln -sf %{sdkdir} %{jrelnk}
   ln -sf %{sdkdir} %{sdklnk}
-popd
+popd}
 
 # Install man pages.
 install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -590,7 +592,7 @@ ext=.gz
 alternatives \
   --install %{_bindir}/java java %{jrebindir}/java %{priority} \
   --slave %{_jvmdir}/jre jre %{_jvmdir}/%{jrelnk} \
-  --slave %{_jvmjardir}/jre jre_exports %{_jvmjardir}/%{jrelnk} \
+  %{?_jvmjardir:--slave %{_jvmjardir}/jre jre_exports %{_jvmjardir}/%{jrelnk}} \
   --slave %{_bindir}/keytool keytool %{jrebindir}/keytool \
   --slave %{_bindir}/orbd orbd %{jrebindir}/orbd \
   --slave %{_bindir}/pack200 pack200 %{jrebindir}/pack200 \
@@ -621,14 +623,14 @@ alternatives \
 alternatives \
   --install %{_jvmdir}/jre-%{origin} \
   jre_%{origin} %{_jvmdir}/%{jrelnk} %{priority} \
-  --slave %{_jvmjardir}/jre-%{origin} \
-  jre_%{origin}_exports %{_jvmjardir}/%{jrelnk}
+  %{?_jvmjardir:--slave %{_jvmjardir}/jre-%{origin} \
+    jre_%{origin}_exports %{_jvmjardir}/%{jrelnk}}
 
 alternatives \
   --install %{_jvmdir}/jre-%{javaver} \
   jre_%{javaver} %{_jvmdir}/%{jrelnk} %{priority} \
-  --slave %{_jvmjardir}/jre-%{javaver} \
-  jre_%{javaver}_exports %{_jvmjardir}/%{jrelnk}
+  %{?_jvmjardir:--slave %{_jvmjardir}/jre-%{javaver} \
+    jre_%{javaver}_exports %{_jvmjardir}/%{jrelnk}}
 
 # Update for jnlp handling.
 update-desktop-database %{_datadir}/applications &> /dev/null || :
@@ -663,7 +665,7 @@ ext=.gz
 alternatives \
   --install %{_bindir}/javac javac %{sdkbindir}/javac %{priority} \
   --slave %{_jvmdir}/java java_sdk %{_jvmdir}/%{sdklnk} \
-  --slave %{_jvmjardir}/java java_sdk_exports %{_jvmjardir}/%{sdklnk} \
+  {?_jvmjardir:--slave %{_jvmjardir}/java java_sdk_exports %{_jvmjardir}/%{sdklnk}} \
   --slave %{_bindir}/appletviewer appletviewer %{sdkbindir}/appletviewer \
   --slave %{_bindir}/apt apt %{sdkbindir}/apt \
   --slave %{_bindir}/extcheck extcheck %{sdkbindir}/extcheck \
@@ -754,14 +756,14 @@ alternatives \
 alternatives \
   --install %{_jvmdir}/java-%{origin} \
   java_sdk_%{origin} %{_jvmdir}/%{sdklnk} %{priority} \
-  --slave %{_jvmjardir}/java-%{origin} \
-  java_sdk_%{origin}_exports %{_jvmjardir}/%{sdklnk}
+  %{?_jvmjardir:--slave %{_jvmjardir}/java-%{origin} \
+    java_sdk_%{origin}_exports %{_jvmjardir}/%{sdklnk}}
 
 alternatives \
   --install %{_jvmdir}/java-%{javaver} \
   java_sdk_%{javaver} %{_jvmdir}/%{sdklnk} %{priority} \
-  --slave %{_jvmjardir}/java-%{javaver} \
-  java_sdk_%{javaver}_exports %{_jvmjardir}/%{sdklnk}
+  %{?_jvmjardir:--slave %{_jvmjardir}/java-%{javaver} \
+    java_sdk_%{javaver}_exports %{_jvmjardir}/%{sdklnk}}
 
 exit 0
 
@@ -798,9 +800,9 @@ exit 0
 %dir %{_jvmdir}/%{sdkdir}
 %{_jvmdir}/%{sdkdir}/release
 %{_jvmdir}/%{jrelnk}
-%{_jvmjardir}/%{jrelnk}
+%{?_jvmjardir:%{_jvmjardir}/%{jrelnk}}
 %{_jvmprivdir}/*
-%{jvmjardir}
+%{?_jvmjardir:%{jvmjardir}}
 %dir %{_jvmdir}/%{jredir}/lib/security
 %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
@@ -833,7 +835,7 @@ exit 0
 %{_jvmdir}/%{sdkdir}/lib/*
 %{_jvmdir}/%{sdkdir}/tapset/*.stp
 %{_jvmdir}/%{sdklnk}
-%{_jvmjardir}/%{sdklnk}
+%{?_jvmjardir:%{_jvmjardir}/%{sdklnk}}
 %{_datadir}/applications/%{name}-jconsole.desktop
 %{_datadir}/applications/%{name}-policytool.desktop
 %{_mandir}/man1/appletviewer-%{name}.1*
@@ -882,6 +884,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jan 29 2018 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.7.0-1
+- Handle removal of _jvmjardir on recent versions of Fedora.
+
 * Wed Jan 24 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-0
 - Update to 3.7.0pre01.
 
