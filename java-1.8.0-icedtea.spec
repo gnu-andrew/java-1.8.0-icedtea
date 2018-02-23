@@ -16,22 +16,22 @@
 
 %define icedteabranch 3.7
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre01
+%define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset d3821aae5f3c
-%define jaxpchangeset e7f6617f2a85
-%define jaxwschangeset 184d3d9543ef
-%define jdkchangeset e4ff08f9c787
-%define langtoolschangeset e32341052fe1
-%define openjdkchangeset 9a7fbbe2d7ed
-%define nashornchangeset 8c6bb035cdd2
-%define hotspotchangeset c14f056eed68
-%define shenandoahchangeset 9adf5a64b23f
+%define corbachangeset 872ca6c060bb
+%define jaxpchangeset 154d73707643
+%define jaxwschangeset 3f0a3aea44b4
+%define jdkchangeset 80cebaab0ba5
+%define langtoolschangeset 0a2dce555d35
+%define openjdkchangeset 644bdc77dd18
+%define nashornchangeset 136ab780f038
+%define hotspotchangeset dcd64d4c0682
+%define shenandoahchangeset a61e3c595e35
 %define aarch32changeset f8b1fb102364
 
 %global aarch64 aarch64 arm64 armv8
@@ -261,7 +261,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -884,6 +884,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 23 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-2
+- Update to 3.7.0.
+
 * Mon Jan 29 2018 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.7.0-1
 - Handle removal of _jvmjardir on recent versions of Fedora.
 
