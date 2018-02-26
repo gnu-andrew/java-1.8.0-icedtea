@@ -30,8 +30,8 @@
 %define langtoolschangeset 0a2dce555d35
 %define openjdkchangeset 644bdc77dd18
 %define nashornchangeset 136ab780f038
-%define hotspotchangeset dcd64d4c0682
-%define shenandoahchangeset a61e3c595e35
+%define hotspotchangeset 074a569c30e4
+%define shenandoahchangeset 773364cde857
 %define aarch32changeset f8b1fb102364
 
 %global aarch64 aarch64 arm64 armv8
@@ -884,6 +884,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 26 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-2
+- Update HotSpot changesets to versions with fixed version of 8164113.
+
 * Fri Feb 23 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-2
 - Update to 3.7.0.
 
