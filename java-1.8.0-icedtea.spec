@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Red Hat, Inc.
+# Copyright (C) 2018 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 %define nashornchangeset 136ab780f038
 %define hotspotchangeset 074a569c30e4
 %define shenandoahchangeset 773364cde857
-%define aarch32changeset f8b1fb102364
+%define aarch32changeset 1cd346521065
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -261,7 +261,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 2%{?dist}
+Release: 3%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -884,6 +884,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Feb 28 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-3
+- Update AArch32 changeset to jdk8u161-b13-aarch32-180220.
+
 * Mon Feb 26 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.7.0-2
 - Update HotSpot changesets to versions with fixed version of 8164113.
 
