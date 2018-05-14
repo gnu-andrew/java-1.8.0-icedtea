@@ -123,11 +123,16 @@
 %define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk
 %endif
 %else
+%if 0%{?rhel} <= 7
 %define bootstrap_jdk java-1.7.0-openjdk-devel
 %if 0%{?rhel} < 7
 %define bootstrap_path /usr/lib/jvm/%{bootstrap_name}
 %else
 %define bootstrap_path /usr/lib/jvm/java-1.7.0-openjdk
+%endif
+%else
+%define bootstrap_jdk java-1.8.0-openjdk-devel
+%define bootstrap_path /usr/lib/jvm/java-1.8.0-openjdk
 %endif
 %endif
 
@@ -884,6 +889,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon May 14 2018 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.8.0-1
+- Restrict use of OpenJDK 7 to bootstrap to RHEL 7 and earlier.
+
 * Mon May 14 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.8.0-1
 - Update to 3.8.0pre02.
 
