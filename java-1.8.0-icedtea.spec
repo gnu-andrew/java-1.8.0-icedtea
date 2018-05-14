@@ -28,7 +28,7 @@
 %define jaxwschangeset 92b8de88a9ab
 %define jdkchangeset 388fc8da2304
 %define langtoolschangeset 4a11d88aab1d
-%define openjdkchangeset e3b5e4466fd1
+%define openjdkchangeset 00ccc7349862
 %define nashornchangeset 2fd73cb3eef5
 %define hotspotchangeset 7f6e1069a571
 %define shenandoahchangeset fb1e2ca56e94
@@ -889,6 +889,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon May 14 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.8.0-1
+- Fix OpenJDK changeset/checksum to match final version of pre02.
+
 * Mon May 14 2018 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.8.0-1
 - Restrict use of OpenJDK 7 to bootstrap to RHEL 7 and earlier.
 
