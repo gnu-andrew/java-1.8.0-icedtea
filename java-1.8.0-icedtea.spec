@@ -266,7 +266,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -454,6 +454,14 @@ cp %{SOURCE1} .
 
 %build
 
+# Filter out flags from CFLAGS & CXXFLAGS that cause problems with the OpenJDK build
+# We filter out -O flags so that the optimisation of HotSpot is not lowered from O3 to O2
+# We filter out -Wall which will otherwise cause HotSpot to produce hundreds of thousands of warnings (100+mb logs)
+# We replace it with -Wformat (required by -Werror=format-security) and -Wno-cpp to avoid FORTIFY_SOURCE warnings
+# We filter out -fexceptions as the HotSpot build explicitly does -fno-exceptions and it's otherwise the default for C++
+CFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[0-9]*||'|sed -e 's|-fexceptions||')
+CXXFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[0-9]*||'|sed -e 's|-fexceptions||')
+
 # Build IcedTea and OpenJDK.
 %configure %{bootstrapopt} --prefix=%{_jvmdir}/%{sdkdir} --exec-prefix=%{_jvmdir}/%{sdkdir} \
   --bindir=%{_jvmdir}/%{sdkdir}/bin --includedir=%{_jvmdir}/%{sdkdir}/include \
@@ -463,7 +471,7 @@ cp %{SOURCE1} .
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
   --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
-  --disable-precompiled-headers --enable-improved-font-rendering
+  --disable-precompiled-headers --enable-improved-font-rendering --enable-Werror
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -889,6 +897,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed May 16 2018 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.8.0-2
+- Turn on -Werror and filter out additional warnings introduced by RPM build flags.
+
 * Mon May 14 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.8.0-1
 - Fix OpenJDK changeset/checksum to match final version of pre02.
 
