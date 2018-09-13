@@ -48,10 +48,10 @@
 %define haveshenandoah 0
 %endif
 %ifarch %{ppc64be}
-%define haveshenandoah 0
+%define haveshenandoah 1
 %endif
 %ifarch %{ppc64le}
-%define haveshenandoah 0
+%define haveshenandoah 1
 %endif
 %ifarch i386
 %define haveshenandoah 0
@@ -63,7 +63,7 @@
 %define haveshenandoah 0
 %endif
 %ifarch s390
-%define haveshenandoah 0
+%define haveshenandoah 1
 %endif
 %ifarch s390x
 %define haveshenandoah 0
@@ -879,6 +879,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Sep 13 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.9.0-2
+- Temporarily turn on Shenandoah on s390 & ppc64 to test PR3619, PR3620 & PR3623.
+
 * Thu Sep 13 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.9.0-2
 - Remove unused archbuild & archinstall and add missing ppc64le & s390 archs.
 
