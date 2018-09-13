@@ -42,65 +42,47 @@
 %define jit_arches %{arm} %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
 
 %ifarch x86_64
-%define archbuild amd64
-%define archinstall amd64
 %define haveshenandoah 1
 %endif
 %ifarch ppc
-%define archbuild ppc
-%define archinstall ppc
 %define haveshenandoah 0
 %endif
-%ifarch %{power64}
-%define archbuild ppc64
-%define archinstall ppc64
+%ifarch %{ppc64be}
+%define haveshenandoah 0
+%endif
+%ifarch %{ppc64le}
 %define haveshenandoah 0
 %endif
 %ifarch i386
-%define archbuild i586
-%define archinstall i386
 %define haveshenandoah 0
 %endif
 %ifarch i686
-%define archbuild i586
-%define archinstall i386
 %define haveshenandoah 0
 %endif
 %ifarch ia64
-%define archbuild ia64
-%define archinstall ia64
 %define haveshenandoah 0
 %endif
 %ifarch s390
-%define archbuild s390x
-%define archinstall s390x
+%define haveshenandoah 0
+%endif
+%ifarch s390x
 %define haveshenandoah 0
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
-%define archbuild sparc
-%define archinstall sparc
 %define haveshenandoah 0
 %endif
 # 64 bit sparc
 %ifarch sparc64
-%define archbuild sparcv9
-%define archinstall sparcv9
 %define haveshenandoah 0
 %endif
 %ifarch %{arm}
-%global archinstall arm
-%global stapinstall arm
 %define haveshenandoah 0
 %endif
 %ifarch %{aarch64}
-%global archbuild aarch64
-%global archinstall aarch64
 %define haveshenandoah 1
 %endif
 %ifnarch %{jit_arches}
-%define archbuild %{_arch}
-%define archinstall %{_arch}
 %define haveshenandoah 0
 %endif
 
@@ -897,6 +879,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Sep 13 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.9.0-2
+- Remove unused archbuild & archinstall and add missing ppc64le & s390 archs.
+
 * Thu Sep 13 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.9.0-2
 - Update to 3.9.0.
 
