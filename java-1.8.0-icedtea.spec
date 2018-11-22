@@ -808,7 +808,7 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/limited/US_export_policy.jar
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/policy/limited/local_policy.jar
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/blacklisted.certs
-%{_datadir}/icons/hicolor/*x*/apps/java-%{javaver}.png
+%{_datadir}/icons/hicolor/*x*/apps/java-%{javaver}-openjdk.png
 %{_mandir}/man1/java-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
 %{_mandir}/man1/orbd-%{name}.1*
@@ -879,6 +879,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Nov 22 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-0
+- Add '-openjdk' suffix to icon files, following PR3624.
+
 * Wed Nov 21 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-0
 - Update to 3.10.0pre01.
 
