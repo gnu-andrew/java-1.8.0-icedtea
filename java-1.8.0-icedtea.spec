@@ -49,16 +49,12 @@
 %define haveshenandoah 1
 %global stapinstall x86_64
 %endif
-%ifarch ppc
-%define haveshenandoah 0
-%global stapinstall powerpc
-%endif
 %ifarch %{ppc64be}
 %define haveshenandoah 1
 %global stapinstall powerpc
 %endif
 %ifarch %{ppc64le}
-%define haveshenandoah 1
+%define haveshenandoah 0
 %global stapinstall powerpc
 %endif
 %ifarch i386
@@ -68,18 +64,6 @@
 %ifarch i686
 %define haveshenandoah 0
 %global stapinstall i386
-%endif
-%ifarch ia64
-%define haveshenandoah 0
-%global stapinstall ia64
-%endif
-%ifarch s390
-%define haveshenandoah 1
-%global stapinstall s390
-%endif
-%ifarch s390x
-%define haveshenandoah 0
-%global stapinstall s390
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
@@ -102,6 +86,22 @@
 %ifnarch %{jit_arches}
 %define haveshenandoah 0
 %global stapinstall %{_build_cpu}
+%endif
+%ifarch ia64
+%define haveshenandoah 0
+%global stapinstall ia64
+%endif
+%ifarch s390
+%define haveshenandoah 1
+%global stapinstall s390
+%endif
+%ifarch s390x
+%define haveshenandoah 0
+%global stapinstall s390
+%endif
+%ifarch ppc
+%define haveshenandoah 0
+%global stapinstall powerpc
 %endif
 
 # If bootstrap is 1, OpenJDK is bootstrapped against
@@ -196,6 +196,7 @@
 %endif
 
 # Use Shenandoah on x86_64 and aarch64
+# Also enabled on ppc64be and s390 to check it at least builds on these architectures
 %if %{haveshenandoah}
 %define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
 %else
@@ -882,7 +883,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
-* Sat Dec 01 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-1
+* Sat Dec 01 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-0
+- Setup architecture definitions for non-JIT archs after generic no-JIT section so it doesn't override them.
+- Turn off Shenandoah on ppc64le and add a note about it being enabled for testing on s390 and ppc64be.
+
+* Sat Dec 01 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-0
 - Introduce stapinstall variable to set SystemTap arch directory correctly (e.g. arm64 on aarch64)
 - Remove cacerts and tapset symlink creation now handled by IcedTea's install phase.
 
