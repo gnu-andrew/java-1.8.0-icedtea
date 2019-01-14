@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Red Hat, Inc.
+# Copyright (C) 2019 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,23 +14,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.10
+%define icedteabranch 3.11
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot %{nil}
+%define icedteasnapshot pre01
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 8249f00d6619
-%define jaxpchangeset a1b060ef4f06
-%define jaxwschangeset c0f01861a7fd
-%define jdkchangeset 6e67500d0ed8
-%define langtoolschangeset 7036a6fa432e
-%define openjdkchangeset 90de74e82bfb
-%define nashornchangeset 6cf21321f367
-%define hotspotchangeset 4e4ead43a282
+%define corbachangeset 978ace4a2d1f
+%define jaxpchangeset 3e7294812366
+%define jaxwschangeset 20b1d763b33e
+%define jdkchangeset 1a1eac5703fc
+%define langtoolschangeset aeb6ac72f496
+%define openjdkchangeset 5814556a8741
+%define nashornchangeset 287a6c783833
+%define hotspotchangeset 1423aed335d6
 %define shenandoahchangeset bc4deb768b1d
 %define aarch32changeset f38b47a322eb
 
@@ -267,7 +267,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -883,6 +883,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jan 14 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-0
+- Update to 3.11.0pre01.
+
 * Sun Dec 23 2018 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.10.0-1
 - Update to 3.10.0
 
