@@ -151,19 +151,6 @@
 %define havelcms2 1
 %endif
 
-# Define havasunecnss to 1 if the platform has a
-# version of NSS which can be linked against the Sun EC
-# provider. Support was added in NSS 3.16.1
-%if 0%{?rhel}
-%if 0%{?rhel} < 7
-%define havesunecnss 0
-%else
-%define havesunecnss 1
-%endif
-%else
-%define havesunecnss 1
-%endif
-
 %if %{debug}
 %define debugbuild icedtea-debug
 %else
@@ -178,14 +165,8 @@
 %define bootstrapopt --disable-bootstrap
 %endif
 
-# If with have a SunEC-capable NSS, enable
-# the SunEC provider. Otherwise, use PKCS11
-# for ECC.
-%if %{havesunecnss}
-%define ecopt --enable-sunec
-%else
-%define ecopt --enable-nss
-%endif
+# Enable the PKCS11 provider.
+%define pkcs11opt --enable-nss
 
 # Turn on use of the system LCMS 2 library if
 # available. If not, use the in-tree version.
@@ -322,9 +303,6 @@ BuildRequires: xorg-x11-proto-devel
 BuildRequires: freetype-devel
 # Provides lsb_release for generating distro id in jdk_generic_profile.sh
 BuildRequires: redhat-lsb-core
-%if %{havesunecnss}
-BuildRequires: nss-softokn-freebl-devel >= 3.16.1
-%endif
 BuildRequires: nss-devel
 BuildRequires: libattr-devel
 BuildRequires: %{bootstrap_jdk}
@@ -471,7 +449,7 @@ CXXFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
-  --disable-downloading %{ecopt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
+  --disable-downloading %{pkcs11opt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
   --disable-precompiled-headers --enable-improved-font-rendering --enable-Werror
 
 make %{?_smp_mflags} %{debugbuild}
@@ -883,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Jan 15 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-0
+- Remove SunEC+NSS logic following PR3667.
+
 * Mon Jan 14 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-0
 - Update to 3.11.0pre01.
 
