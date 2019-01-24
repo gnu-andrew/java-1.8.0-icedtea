@@ -30,7 +30,7 @@
 %define langtoolschangeset abbb38dafbc8
 %define openjdkchangeset c995f80cfe5b
 %define nashornchangeset 88ceae600dc8
-%define hotspotchangeset a6c9f05505b1
+%define hotspotchangeset b99dbcd228f6
 %define shenandoahchangeset bc4deb768b1d
 %define aarch32changeset f38b47a322eb
 
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Jan 24 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-1
+- Bump HotSpot changeset to pick up PR3683.
+
 * Wed Jan 23 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-1
 - Update to 3.11.0pre02.
 
