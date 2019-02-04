@@ -31,8 +31,8 @@
 %define openjdkchangeset c995f80cfe5b
 %define nashornchangeset 88ceae600dc8
 %define hotspotchangeset b99dbcd228f6
-%define shenandoahchangeset bc4deb768b1d
-%define aarch32changeset f38b47a322eb
+%define shenandoahchangeset 106435e9e204
+%define aarch32changeset 8b4e37a274de
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -248,7 +248,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 04 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-2
+- Bump Shenandoah & AArch32 changesets for 3.11.0pre02.
+
 * Thu Jan 24 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.11.0-1
 - Bump HotSpot changeset to pick up PR3683.
 
