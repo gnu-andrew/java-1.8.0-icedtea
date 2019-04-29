@@ -32,7 +32,7 @@
 %define nashornchangeset 93462e8b4f4f
 %define hotspotchangeset 3f9a60eb8ef0
 %define shenandoahchangeset adb62c0031b8
-%define aarch32changeset 9eb7ef8252bb
+%define aarch32changeset 03e95de3bc18
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 29 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.12.0-1
+- Bump AArch32 changeset to pick up 8213419.
+
 * Sun Apr 28 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.12.0-1
 - Update to 3.12.0.
 
