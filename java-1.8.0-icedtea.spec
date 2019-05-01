@@ -32,7 +32,7 @@
 %define nashornchangeset 93462e8b4f4f
 %define hotspotchangeset 3f9a60eb8ef0
 %define shenandoahchangeset adb62c0031b8
-%define aarch32changeset 81a383ab33ee
+%define aarch32changeset 57f4048a925b
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -248,7 +248,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed May 01 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.12.0-2
+- Bump AArch32 changeset to switch to upstream version (jdk8u212-b04-aarch32-190430).
+
 * Tue Apr 30 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.12.0-1
 - Bump AArch32 changeset to pick up 8214189.
 
