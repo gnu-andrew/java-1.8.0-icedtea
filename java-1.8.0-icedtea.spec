@@ -16,23 +16,23 @@
 
 %define icedteabranch 3.14
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre01
+%define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 8603ad099188
-%define jaxpchangeset a8bf97e97149
-%define jaxwschangeset fb9f067e1218
-%define jdkchangeset 740c6726f6fe
-%define langtoolschangeset 69b271efa4fa
-%define openjdkchangeset d1cf93b54a47
-%define nashornchangeset 349bdbf4733b
-%define hotspotchangeset a8b62a7ca950
-%define shenandoahchangeset eaa9fc3d8b61
-%define aarch32changeset 26d64a5c4b9a
+%define corbachangeset a37140ba122d
+%define jaxpchangeset 9f2145980ba0
+%define jaxwschangeset af5760dceec0
+%define jdkchangeset ce6c8c2cad27
+%define langtoolschangeset ccec65feaaac
+%define openjdkchangeset 454c6cbb8073
+%define nashornchangeset 13722b4babad
+%define hotspotchangeset 4ccc1ae03940
+%define shenandoahchangeset 9e52f8d3b511
+%define aarch32changeset 0d7b61c79fee
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Nov 12 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.14.0-1
+- Update to 3.14.0.
+
 * Tue Nov 12 2019 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.14.0-1
 - Turn off 'haveshenandoah' on all architectures so the IcedTea HotSpot gets fully tested.
 
