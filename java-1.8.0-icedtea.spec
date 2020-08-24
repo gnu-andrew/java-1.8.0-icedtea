@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Red Hat, Inc.
+# Copyright (C) 2020 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,25 +14,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.16
+%define icedteabranch 3.17
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot %{nil}
+%define icedteasnapshot pre01
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset ea3169880d70
-%define jaxpchangeset 883803235596
-%define jaxwschangeset e5d96dc9988a
-%define jdkchangeset bb9b9a0ad162
-%define langtoolschangeset e47d37e5fe0b
-%define openjdkchangeset bca1f7228ce8
-%define nashornchangeset 1d70dcb4ab53
-%define hotspotchangeset eeb08cfebded
-%define shenandoahchangeset e4e81ae21643
-%define aarch32changeset ecc1eb1dc760
+%define corbachangeset e1696465ea34
+%define jaxpchangeset 53bd98f3ee46
+%define jaxwschangeset accca84b727d
+%define jdkchangeset c409176a879f
+%define langtoolschangeset ad7ffc1bb8e1
+%define openjdkchangeset 224893ede003
+%define nashornchangeset 36e295162ff1
+%define hotspotchangeset 88961de57e43
+%define shenandoahchangeset 7d23269db69a
+%define aarch32changeset 104a5c7f735e
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -248,7 +248,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -861,6 +861,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Aug 24 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-0
+- Update to 3.17.0pre01.
+
 * Sat May 02 2020 Andrew John Hughes <gnu.andrew@redhat.com> - 1:3.16.0-1
 - Update to 3.16.0.
 
