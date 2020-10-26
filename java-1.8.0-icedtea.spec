@@ -16,23 +16,23 @@
 
 %define icedteabranch 3.17
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre01
+%define icedteasnapshot pre02
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset e1696465ea34
-%define jaxpchangeset 53bd98f3ee46
-%define jaxwschangeset accca84b727d
-%define jdkchangeset c409176a879f
-%define langtoolschangeset ad7ffc1bb8e1
-%define openjdkchangeset 224893ede003
-%define nashornchangeset 36e295162ff1
-%define hotspotchangeset 88961de57e43
-%define shenandoahchangeset 7d23269db69a
-%define aarch32changeset 104a5c7f735e
+%define corbachangeset 8aafb146a99e
+%define jaxpchangeset ae372ac2562a
+%define jaxwschangeset a86aa3e2a7c8
+%define jdkchangeset 95ac792d396e
+%define langtoolschangeset 4ea625a4e156
+%define openjdkchangeset aedccd51873f
+%define nashornchangeset 3c07ff843d55
+%define hotspotchangeset 9cc00eb32cbd
+%define shenandoahchangeset f9a4ff26a4bd
+%define aarch32changeset f700065950de
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -40,6 +40,7 @@
 
 %define multilib_arches %{ppc64be} sparc64 x86_64
 %define jit_arches %{arm} %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
+%define jfr_arches %{arm} %{aarch64} x86_64 sparcv9 sparc64 %{power64}
 
 # In some cases, the arch used by the JDK does
 # not match _arch.
@@ -248,7 +249,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -449,8 +450,16 @@ CXXFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[
   --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
   --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
   --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
+%ifarch %{jfr_arches}
+    --enable-jfr \
+%else
+    --disable-jfr \
+%endif
   --disable-downloading %{pkcs11opt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
-  --disable-precompiled-headers --enable-improved-font-rendering --enable-Werror
+  --enable-improved-font-rendering --enable-Werror \
+%ifnarch %{aarch64}
+  --disable-precompiled-headers
+%endif
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -861,6 +870,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Oct 26 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-1
+- Update to 3.17.0pre02.
+- Disable JFR explicitly on architectures where it doesn't build (x86).
+- Enable pre-compiled headers on AArch64 due to current breakage without.
+
 * Mon Aug 24 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-0
 - Update to 3.17.0pre01.
 
