@@ -16,23 +16,23 @@
 
 %define icedteabranch 3.17
 %define icedteaver %{icedteabranch}.0
-%define icedteasnapshot pre02
+%define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
 %define openjdkurl http://hg.openjdk.java.net
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 8aafb146a99e
-%define jaxpchangeset ae372ac2562a
-%define jaxwschangeset a86aa3e2a7c8
-%define jdkchangeset 95ac792d396e
-%define langtoolschangeset 4ea625a4e156
-%define openjdkchangeset aedccd51873f
-%define nashornchangeset 3c07ff843d55
-%define hotspotchangeset 9cc00eb32cbd
-%define shenandoahchangeset f9a4ff26a4bd
-%define aarch32changeset f700065950de
+%define corbachangeset 29969b96b06f
+%define jaxpchangeset 0a628fd38b65
+%define jaxwschangeset 02744f3ceba7
+%define jdkchangeset efb8a0718403
+%define langtoolschangeset 83b7a751f44f
+%define openjdkchangeset a612a04781bd
+%define nashornchangeset 347f82a7813a
+%define hotspotchangeset 7caa24d952f7
+%define shenandoahchangeset efc167880db9
+%define aarch32changeset aed49822247b
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -40,7 +40,7 @@
 
 %define multilib_arches %{ppc64be} sparc64 x86_64
 %define jit_arches %{arm} %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
-%define jfr_arches %{arm} %{aarch64} x86_64 sparcv9 sparc64 %{power64}
+%define jfr_arches %{jit_arches}
 
 # In some cases, the arch used by the JDK does
 # not match _arch.
@@ -249,7 +249,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -456,10 +456,7 @@ CXXFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[
     --disable-jfr \
 %endif
   --disable-downloading %{pkcs11opt} %{lcmsopt} --disable-tests --disable-systemtap-tests \
-  --enable-improved-font-rendering --enable-Werror \
-%ifnarch %{aarch64}
-  --disable-precompiled-headers
-%endif
+  --enable-improved-font-rendering --enable-Werror --disable-precompiled-headers
 
 make %{?_smp_mflags} %{debugbuild}
 
@@ -870,6 +867,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Tue Oct 27 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-2
+- Update to 3.17.0.
+- Enable JFR on all JIT architectures now JDK-8252096/PR3810 is fixed for x86.
+- Disable pre-compiled headers on AArch64 again now build breakage is fixed.
+
 * Mon Oct 26 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-1
 - Update to 3.17.0pre02.
 - Disable JFR explicitly on architectures where it doesn't build (x86).
