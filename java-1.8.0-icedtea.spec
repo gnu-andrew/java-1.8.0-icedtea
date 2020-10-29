@@ -434,6 +434,14 @@ cp %{SOURCE1} .
 
 %build
 
+# This package fails to build with LTO due to undefined symbols
+# (_ZN14G1CMOopClosure9do_oop_nvIjEEvPT or
+# void G1CMOopClosure::do_oop_nv<unsigned int>(unsigned int*))
+# LTO was disabled in OpenSuSE as well, but with no real explanation why
+# beyond the undefined symbols.  It really should be investigated further.
+# Disable LTO
+%define _lto_cflags %{nil}
+
 # Filter out flags from CFLAGS & CXXFLAGS that cause problems with the OpenJDK build
 # We filter out -O flags so that the optimisation of HotSpot is not lowered from O3 to O2
 # We filter out -Wall which will otherwise cause HotSpot to produce hundreds of thousands of warnings (100+mb logs)
@@ -867,6 +875,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Oct 29 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-2
+- Turn off LTO on Fedora so libjvm.so doesn't fail to link.
+
 * Tue Oct 27 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-2
 - Update to 3.17.0.
 - Enable JFR on all JIT architectures now JDK-8252096/PR3810 is fixed for x86.
