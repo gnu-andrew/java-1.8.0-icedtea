@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 %define icedteabranch 3.17
-%define icedteaver %{icedteabranch}.0
+%define icedteaver %{icedteabranch}.1
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
@@ -23,16 +23,16 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 29969b96b06f
-%define jaxpchangeset 0a628fd38b65
-%define jaxwschangeset 02744f3ceba7
-%define jdkchangeset efb8a0718403
-%define langtoolschangeset 83b7a751f44f
-%define openjdkchangeset a612a04781bd
-%define nashornchangeset 347f82a7813a
-%define hotspotchangeset 7caa24d952f7
-%define shenandoahchangeset efc167880db9
-%define aarch32changeset aed49822247b
+%define corbachangeset 9900c5052dc8
+%define jaxpchangeset f7131ba06615
+%define jaxwschangeset 041bec57e152
+%define jdkchangeset 2207d468c781
+%define langtoolschangeset 46c4c126f559
+%define openjdkchangeset f8fecdfef399
+%define nashornchangeset c3cf7b1edca2
+%define hotspotchangeset e7fd2b284bd0
+%define shenandoahchangeset bef9421300e3
+%define aarch32changeset c6d8704fd9a4
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -249,7 +249,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 2%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -875,6 +875,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Nov 25 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.1-0
+- Update to 3.17.1.
+
 * Thu Oct 29 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.0-2
 - Turn off LTO on Fedora so libjvm.so doesn't fail to link.
 
