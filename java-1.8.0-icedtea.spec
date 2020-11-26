@@ -41,68 +41,57 @@
 %define multilib_arches %{ppc64be} sparc64 x86_64
 %define jit_arches %{arm} %{aarch64} %{ix86} x86_64 sparcv9 sparc64 %{power64}
 %define jfr_arches %{jit_arches}
+# Set of architectures for which we build the Shenandoah garbage collector
+%global shenandoah_arches noarch
 
 # In some cases, the arch used by the JDK does
 # not match _arch.
 # Also, in some cases, the machine name used by SystemTap
 # does not match that given by _build_cpu
 %ifarch x86_64
-%define haveshenandoah 0
 %global stapinstall x86_64
 %endif
 %ifarch %{ppc64be}
-%define haveshenandoah 0
 %global stapinstall powerpc
 %endif
 %ifarch %{ppc64le}
-%define haveshenandoah 0
 %global stapinstall powerpc
 %endif
 %ifarch i386
-%define haveshenandoah 0
 %global stapinstall i386
 %endif
 %ifarch i686
-%define haveshenandoah 0
 %global stapinstall i386
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
-%define haveshenandoah 0
 %global stapinstall %{_build_cpu}
 %endif
 # 64 bit sparc
 %ifarch sparc64
-%define haveshenandoah 0
 %global stapinstall %{_build_cpu}
 %endif
 %ifarch %{arm}
-%define haveshenandoah 0
 %global stapinstall arm
 %endif
 %ifarch %{aarch64}
-%define haveshenandoah 0
 %global stapinstall arm64
 %endif
-%ifnarch %{jit_arches}
-%define haveshenandoah 0
-%global stapinstall %{_build_cpu}
-%endif
 %ifarch ia64
-%define haveshenandoah 0
 %global stapinstall ia64
 %endif
 %ifarch s390
-%define haveshenandoah 0
 %global stapinstall s390
 %endif
 %ifarch s390x
-%define haveshenandoah 0
 %global stapinstall s390
 %endif
 %ifarch ppc
-%define haveshenandoah 0
 %global stapinstall powerpc
+%endif
+# Need to support noarch for srpm build
+%ifarch noarch
+%global stapinstall %{nil}
 %endif
 
 # If bootstrap is 1, OpenJDK is bootstrapped against
@@ -179,7 +168,7 @@
 
 # Use Shenandoah on x86_64 and aarch64
 # Also enabled on ppc64be and s390 to check it at least builds on these architectures
-%if %{haveshenandoah}
+%ifarch %{shenandoah_arches}
 %define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
 %else
 %ifarch %{arm}
@@ -249,7 +238,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 0%{?dist}
+Release: 1%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -428,6 +417,14 @@ Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 The OpenJDK API documentation.
 
 %prep
+
+# Using the echo macro breaks rpmdev-bumpspec, as it parses the first line of stdout :-(
+%if 0%{?stapinstall:1}
+  echo "CPU: %{_target_cpu}, SystemTap install directory: %{stapinstall}"
+%else
+  %{error:Unrecognised architecture %{_target_cpu}}
+%endif
+
 %setup -q -n icedtea-%{icedteaver}%{icedteasnapshot}
 
 cp %{SOURCE1} .
@@ -875,6 +872,10 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Nov 26 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.1-1
+- Replace haveshenandoah with shenandoah_arches as in the RHEL build.
+- Catch unsupported build architectures and exit with an error.
+
 * Wed Nov 25 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.1-0
 - Update to 3.17.1.
 
