@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Red Hat, Inc.
+# Copyright (C) 2021 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.17
-%define icedteaver %{icedteabranch}.1
+%define icedteabranch 3.18
+%define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
 %define icedteaurl http://icedtea.classpath.org
@@ -23,16 +23,16 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 9900c5052dc8
-%define jaxpchangeset f7131ba06615
-%define jaxwschangeset 041bec57e152
-%define jdkchangeset 2207d468c781
-%define langtoolschangeset 46c4c126f559
-%define openjdkchangeset f8fecdfef399
-%define nashornchangeset c3cf7b1edca2
-%define hotspotchangeset e7fd2b284bd0
-%define shenandoahchangeset bef9421300e3
-%define aarch32changeset c6d8704fd9a4
+%define corbachangeset d59f0469fa04
+%define jaxpchangeset 061e5c9ba6d4
+%define jaxwschangeset f8612a9ad613
+%define jdkchangeset d8a3d99c0350
+%define langtoolschangeset cd1c5b6dfb61
+%define openjdkchangeset b8690148b02e
+%define nashornchangeset 7ab7b1755f9a
+%define hotspotchangeset adc340baec52
+%define shenandoahchangeset 6c6414cb341e
+%define aarch32changeset 21692a35b634
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -129,16 +129,16 @@
 # If debug is 1, a debug build of OpenJDK is performed.
 %define debug 0
 
-# Define havelcms2 to 1 if the platform has lcms2
-# All supported Fedoras do as does RHEL 7
-%if 0%{?rhel}
-%if 0%{?rhel} < 7
+# Define havelcms2 to 1 if the platform has lcms2 >= 2.11
+# Only Fedora >= 33 does at present
+%if 0%{?fedora}
+%if 0%{?fedora} < 33
 %define havelcms2 0
 %else
 %define havelcms2 1
 %endif
 %else
-%define havelcms2 1
+%define havelcms2 0
 %endif
 
 %if %{debug}
@@ -238,7 +238,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 0%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -279,7 +279,6 @@ BuildRequires: libXtst-devel
 BuildRequires: libXext-devel
 BuildRequires: libXrender-devel
 BuildRequires: libXau-devel
-BuildRequires: libXdmcp-devel
 BuildRequires: libXinerama-devel
 BuildRequires: libXcomposite-devel
 BuildRequires: zlib-devel
@@ -287,7 +286,7 @@ BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
 BuildRequires: giflib-devel
 %if %{havelcms2}
-BuildRequires: lcms2-devel >= 2.5
+BuildRequires: lcms2-devel >= 2.11
 %endif
 BuildRequires: xorg-x11-proto-devel
 BuildRequires: freetype-devel
@@ -872,6 +871,11 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 05 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.18.0-0
+- Update to 3.18.0.
+- Drop unneeded libXdmcp-devel dependency.
+- Require LCMS >= 2.11 (current in-tree version) to use system LCMS.
+
 * Thu Nov 26 2020 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.17.1-1
 - Replace haveshenandoah with shenandoah_arches as in the RHEL build.
 - Catch unsupported build architectures and exit with an error.
