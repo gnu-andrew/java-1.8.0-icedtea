@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.19
+%define icedteabranch 3.20
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
@@ -23,16 +23,16 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset dc3d33a55c45
-%define jaxpchangeset 93b355ba168f
-%define jaxwschangeset 1bde55696c2d
-%define jdkchangeset 2d5d2c77faa3
-%define langtoolschangeset 1f49866c8fbb
-%define openjdkchangeset bce8f651ffc3
-%define nashornchangeset f6576b186f8f
-%define hotspotchangeset 70bbf51f2f75
-%define shenandoahchangeset 9e58eb00ef60
-%define aarch32changeset fa977f20ebe0
+%define corbachangeset 1f14e14fdf99
+%define jaxpchangeset d68debd27642
+%define jaxwschangeset 2911b86484af
+%define jdkchangeset 6794bb8c7e71
+%define langtoolschangeset 13da694b4e96
+%define openjdkchangeset 7c5f02c37fb9
+%define nashornchangeset 431ebe132c43
+%define hotspotchangeset 3aad0bef5ed4
+%define shenandoahchangeset e7fba27b8fde
+%define aarch32changeset c7ceaaaa5d93
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -871,6 +871,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jul 28 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.20.0-0
+- Update to 3.20.0
+
 * Mon May 03 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.19.0-0
 - Update to 3.19.0.
 
