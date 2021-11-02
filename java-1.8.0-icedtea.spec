@@ -238,7 +238,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{icedteaver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -296,7 +296,9 @@ BuildRequires: nss-devel
 BuildRequires: libattr-devel
 BuildRequires: %{bootstrap_jdk}
 BuildRequires: pkgconfig >= 0.9.0
+%if 0%{?fedora} < 36
 BuildRequires: xorg-x11-utils
+%endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
@@ -871,6 +873,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Mon Nov 01 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.21.0-2
+- Remove xorg-x11-utils requirement on Fedora 36+.
+
 * Mon Nov 01 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.21.0-1
 - Update to 3.21.0
 
