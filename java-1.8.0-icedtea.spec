@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Red Hat, Inc.
+# Copyright (C) 2022 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.21
+%define icedteabranch 3.22
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
@@ -23,16 +23,9 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define corbachangeset 9ef39c8a51b7
-%define jaxpchangeset 04888ba4e6b8
-%define jaxwschangeset 9542ce53562a
-%define jdkchangeset 5a0743ebdb6c
-%define langtoolschangeset f88bd53c10be
-%define openjdkchangeset 29f5c19e1750
-%define nashornchangeset 5fa6edcced6b
-%define hotspotchangeset 39a85246fd4d
-%define shenandoahchangeset 55c41dea0d82
-%define aarch32changeset 15ff1c32911c
+%define openjdkchangeset e69cf98bf0
+%define shenandoahchangeset d56198b0d6
+%define aarch32changeset 42926ba2d2
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -169,12 +162,12 @@
 # Use Shenandoah on x86_64 and aarch64
 # Also enabled on ppc64be and s390 to check it at least builds on these architectures
 %ifarch %{shenandoah_arches}
-%define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE10}
+%define hsopt --with-hotspot-build=shenandoah --with-hotspot-src-zip=%{SOURCE3}
 %else
 %ifarch %{arm}
-%define hsopt --with-hotspot-src-zip=%{SOURCE11}
+%define hsopt --with-hotspot-src-zip=%{SOURCE4}
 %else
-%define hsopt --with-hotspot-src-zip=%{SOURCE7}
+%define hsopt %{nil}
 %endif
 %endif
 
@@ -256,16 +249,9 @@ License:  ASL 1.1, ASL 2.0, GPL+, GPLv2, GPLv2 with exceptions, LGPL+, LGPLv2, M
 URL:      http://icedtea.classpath.org/
 Source0:  %{icedteaurl}/download/source/icedtea-%{icedteaver}%{icedteasnapshot}.tar.xz
 Source1:  README.src
-Source2:  %{repourl}/openjdk.tar.xz#/openjdk-%{openjdkchangeset}.tar.xz
-Source3:  %{repourl}/corba.tar.xz#/corba-%{corbachangeset}.tar.xz
-Source4:  %{repourl}/jaxp.tar.xz#/jaxp-%{jaxpchangeset}.tar.xz
-Source5:  %{repourl}/jaxws.tar.xz#/jaxws-%{jaxwschangeset}.tar.xz
-Source6:  %{repourl}/jdk.tar.xz#/jdk-%{jdkchangeset}.tar.xz
-Source7:  %{repourl}/hotspot.tar.xz#/hotspot-%{hotspotchangeset}.tar.xz
-Source8:  %{repourl}/langtools.tar.xz#/langtools-%{langtoolschangeset}.tar.xz
-Source9:  %{repourl}/nashorn.tar.xz#/nashorn-%{nashornchangeset}.tar.xz
-Source10:  %{repourl}/shenandoah.tar.xz#/shenandoah-%{shenandoahchangeset}.tar.xz
-Source11:  %{repourl}/aarch32.tar.xz#/aarch32-%{aarch32changeset}.tar.xz
+Source2:  %{repourl}/openjdk-git.tar.xz#/openjdk-%{openjdkchangeset}.tar.xz
+Source3:  %{repourl}/shenandoah-git.tar.xz#/shenandoah-%{shenandoahchangeset}.tar.xz
+Source4:  %{repourl}/aarch32-git.tar.xz#/aarch32-%{aarch32changeset}.tar.xz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -450,10 +436,7 @@ CXXFLAGS=$(echo %{optflags}|sed -e 's|-Wall|-Wformat -Wno-cpp|'|sed -r -e 's|-O[
 %configure %{bootstrapopt} --prefix=%{_jvmdir}/%{sdkdir} --exec-prefix=%{_jvmdir}/%{sdkdir} \
   --bindir=%{_jvmdir}/%{sdkdir}/bin --includedir=%{_jvmdir}/%{sdkdir}/include \
   --docdir=%{_defaultdocdir}/%{name} --mandir=%{_jvmdir}/%{sdkdir}/man \
-  --htmldir=%{_javadocdir}/%{name} --with-openjdk-src-zip=%{SOURCE2} \
-  --with-corba-src-zip=%{SOURCE3} --with-jaxp-src-zip=%{SOURCE4} \
-  --with-jaxws-src-zip=%{SOURCE5} --with-jdk-src-zip=%{SOURCE6} \
-  --with-langtools-src-zip=%{SOURCE8} --with-nashorn-src-zip=%{SOURCE9} %{hsopt} \
+  --htmldir=%{_javadocdir}/%{name} --with-openjdk-src-zip=%{SOURCE2} %{hsopt} \
 %ifarch %{jfr_arches}
     --enable-jfr \
 %else
@@ -871,6 +854,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 04 2022 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.22.0-1
+- Update to 3.22.0 and adapt to Git tarballs
+
 * Mon Nov 01 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.21.0-1
 - Update to 3.21.0
 
