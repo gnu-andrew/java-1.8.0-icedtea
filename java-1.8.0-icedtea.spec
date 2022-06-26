@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.22
+%define icedteabranch 3.23
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
@@ -23,9 +23,9 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define openjdkchangeset e69cf98bf0
-%define shenandoahchangeset d56198b0d6
-%define aarch32changeset 42926ba2d2
+%define openjdkchangeset 0b6a5122d61
+%define shenandoahchangeset 5fd137dfc13
+%define aarch32changeset f98704326b
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -854,6 +854,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Sun Jun 26 2022 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.23.0-1
+- Update to 3.23.0
+
 * Fri Mar 04 2022 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.22.0-1
 - Update to 3.22.0 and adapt to Git tarballs
 
