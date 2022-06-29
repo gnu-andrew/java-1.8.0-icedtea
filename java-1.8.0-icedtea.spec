@@ -282,7 +282,9 @@ BuildRequires: nss-devel
 BuildRequires: libattr-devel
 BuildRequires: %{bootstrap_jdk}
 BuildRequires: pkgconfig >= 0.9.0
+%if 0%{?fedora} < 36
 BuildRequires: xorg-x11-utils
+%endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
@@ -859,6 +861,9 @@ exit 0
 
 * Fri Mar 04 2022 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.22.0-1
 - Update to 3.22.0 and adapt to Git tarballs
+
+* Mon Nov 01 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.21.0-2
+- Remove xorg-x11-utils requirement on Fedora 36+.
 
 * Mon Nov 01 2021 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.21.0-1
 - Update to 3.21.0
