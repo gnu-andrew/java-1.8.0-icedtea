@@ -8,3 +8,5 @@ jdk-*.tar.xz
 hotspot-*.tar.xz
 langtools-*.tar.xz
 nashorn-*.tar.xz
+shenandoah-*.tar.xz
+aarch32-*.tar.xz
