@@ -18,8 +18,7 @@
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
-%define icedteaurl http://icedtea.classpath.org
-%define openjdkurl http://hg.openjdk.java.net
+%define icedteaurl https://icedtea.classpath.org
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
@@ -858,6 +857,7 @@ exit 0
 %changelog
 * Mon Jul 21 2025 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.36.0-1
 - Update to 3.36.0
+- Remove unused openjdkurl and change icedteaurl to use https
 
 * Sun May 04 2025 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.35.0-1
 - Update to 3.35.0
