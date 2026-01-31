@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Red Hat, Inc.
+# Copyright (C) 2026 Red Hat, Inc.
 # Written by Andrew John Hughes <gnu.andrew@redhat.com>.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-%define icedteabranch 3.37
+%define icedteabranch 3.38
 %define icedteaver %{icedteabranch}.0
 %define icedteasnapshot %{nil}
 
@@ -22,9 +22,9 @@
 %define dropurl %{icedteaurl}/download/drops
 %define repourl %{dropurl}/icedtea8/%{icedteaver}
 
-%define openjdkchangeset 9d4138b9d01
-%define shenandoahchangeset 3a926122dc3
-%define aarch32changeset 5b29b27e534
+%define openjdkchangeset 4f0a262e7d6
+%define shenandoahchangeset 829db81ff3d
+%define aarch32changeset b2165a2663c
 
 %global aarch64 aarch64 arm64 armv8
 %global ppc64le	ppc64le
@@ -855,6 +855,9 @@ exit 0
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Sat Jan 31 2026 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.38.0-1
+- Update to 3.38.0
+
 * Mon Nov 03 2025 Andrew Hughes <gnu.andrew@redhat.com> - 1:3.37.0-1
 - Update to 3.37.0
 
